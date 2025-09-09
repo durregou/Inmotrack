@@ -1,0 +1,581 @@
+{
+	"info": {
+		"_postman_id": "12345678-1234-1234-1234-123456789012",
+		"name": "Microservicios Arrendamiento",
+		"description": "Colección completa para probar todos los microservicios del sistema de arrendamiento",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "🔐 Administración Service",
+			"item": [
+				{
+					"name": "Login Administrador",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set(\"jwt_token\", jsonData.token);",
+									"    console.log(\"Token guardado: \" + jsonData.token);",
+									"}",
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response has token\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('token');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"correo\": \"admin@sistema.com\",\n    \"contrasena\": \"admin123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}:{{admin_port}}/api/admin/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"port": "{{admin_port}}",
+							"path": [
+								"api",
+								"admin",
+								"login"
+							]
+						}
+					}
+				},
+				{
+					"name": "Consultar Administrador",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}:{{admin_port}}/api/admin/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"port": "{{admin_port}}",
+							"path": [
+								"api",
+								"admin",
+								"1"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "👤 Propietarios Service",
+			"item": [
+				{
+					"name": "Registrar Propietario",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"if (pm.response.code === 201) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set(\"propietario_id\", jsonData.id);",
+									"    console.log(\"ID de propietario guardado: \" + jsonData.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"nombre\": \"Juan Carlos\",\n    \"apellido\": \"Pérez López\",\n    \"correo\": \"juan.perez@email.com\",\n    \"contrasena\": \"password123\",\n    \"telefono\": \"3001234567\",\n    \"direccion\": \"Calle 123 #45-67, Bogotá\",\n    \"cedula\": \"12345678\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}:{{propietarios_port}}/api/propietarios",
+							"host": [
+								"{{base_url}}"
+							],
+							"port": "{{propietarios_port}}",
+							"path": [
+								"api",
+								"propietarios"
+							]
+						}
+					}
+				},
+				{
+					"name": "Obtener Propietario",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}:{{propietarios_port}}/api/propietarios/{{propietario_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"port": "{{propietarios_port}}",
+							"path": [
+								"api",
+								"propietarios",
+								"{{propietario_id}}"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "🏠 Inmuebles Service",
+			"item": [
+				{
+					"name": "Registrar Inmueble",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"if (pm.response.code === 201) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set(\"inmueble_id\", jsonData.id);",
+									"    console.log(\"ID de inmueble guardado: \" + jsonData.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"propietarioId\": {{propietario_id}},\n    \"tipo\": \"Apartamento\",\n    \"direccion\": \"Carrera 15 #85-42, Apto 501\",\n    \"ciudad\": \"Bogotá\",\n    \"departamento\": \"Cundinamarca\",\n    \"area\": 85.5,\n    \"habitaciones\": 3,\n    \"banos\": 2,\n    \"parqueaderos\": 1,\n    \"precioArriendo\": 1500000,\n    \"precioAdministracion\": 180000,\n    \"descripcion\": \"Apartamento moderno con excelente ubicación\",\n    \"amoblado\": false,\n    \"disponible\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}:{{inmuebles_port}}/api/inmuebles",
+							"host": [
+								"{{base_url}}"
+							],
+							"port": "{{inmuebles_port}}",
+							"path": [
+								"api",
+								"inmuebles"
+							]
+						}
+					}
+				},
+				{
+					"name": "Listar Inmuebles",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}:{{inmuebles_port}}/api/inmuebles",
+							"host": [
+								"{{base_url}}"
+							],
+							"port": "{{inmuebles_port}}",
+							"path": [
+								"api",
+								"inmuebles"
+							]
+						}
+					}
+				},
+				{
+					"name": "Obtener Inmueble",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}:{{inmuebles_port}}/api/inmuebles/{{inmueble_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"port": "{{inmuebles_port}}",
+							"path": [
+								"api",
+								"inmuebles",
+								"{{inmueble_id}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "Filtrar por Tipo",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}:{{inmuebles_port}}/api/inmuebles?tipo=Apartamento",
+							"host": [
+								"{{base_url}}"
+							],
+							"port": "{{inmuebles_port}}",
+							"path": [
+								"api",
+								"inmuebles"
+							],
+							"query": [
+								{
+									"key": "tipo",
+									"value": "Apartamento"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Actualizar Disponibilidad",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}:{{inmuebles_port}}/api/inmuebles/{{inmueble_id}}/disponibilidad?disponible=false",
+							"host": [
+								"{{base_url}}"
+							],
+							"port": "{{inmuebles_port}}",
+							"path": [
+								"api",
+								"inmuebles",
+								"{{inmueble_id}}",
+								"disponibilidad"
+							],
+							"query": [
+								{
+									"key": "disponible",
+									"value": "false"
+								}
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "📋 Contratos Service",
+			"item": [
+				{
+					"name": "Crear Contrato",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"if (pm.response.code === 201) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set(\"contrato_id\", jsonData.id);",
+									"    console.log(\"ID de contrato guardado: \" + jsonData.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"inmuebleId\": {{inmueble_id}},\n    \"propietarioId\": {{propietario_id}},\n    \"arrendatarioId\": 1,\n    \"fechaInicio\": \"2024-01-01\",\n    \"fechaFin\": \"2024-12-31\",\n    \"valorArriendo\": 1500000,\n    \"valorAdministracion\": 180000,\n    \"deposito\": 1500000,\n    \"diaPago\": 5,\n    \"observaciones\": \"Contrato de arrendamiento estándar\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}:{{contratos_port}}/api/contratos",
+							"host": [
+								"{{base_url}}"
+							],
+							"port": "{{contratos_port}}",
+							"path": [
+								"api",
+								"contratos"
+							]
+						}
+					}
+				},
+				{
+					"name": "Consultar Contrato",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}:{{contratos_port}}/api/contratos/{{contrato_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"port": "{{contratos_port}}",
+							"path": [
+								"api",
+								"contratos",
+								"{{contrato_id}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "Listar Contratos",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}:{{contratos_port}}/api/contratos",
+							"host": [
+								"{{base_url}}"
+							],
+							"port": "{{contratos_port}}",
+							"path": [
+								"api",
+								"contratos"
+							]
+						}
+					}
+				},
+				{
+					"name": "Contratos por Propietario",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}:{{contratos_port}}/api/contratos?propietarioId={{propietario_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"port": "{{contratos_port}}",
+							"path": [
+								"api",
+								"contratos"
+							],
+							"query": [
+								{
+									"key": "propietarioId",
+									"value": "{{propietario_id}}"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Finalizar Contrato",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}:{{contratos_port}}/api/contratos/{{contrato_id}}/finalizar",
+							"host": [
+								"{{base_url}}"
+							],
+							"port": "{{contratos_port}}",
+							"path": [
+								"api",
+								"contratos",
+								"{{contrato_id}}",
+								"finalizar"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "💰 Pagos Service",
+			"item": [
+				{
+					"name": "Registrar Pago",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"if (pm.response.code === 201) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set(\"pago_id\", jsonData.id);",
+									"    console.log(\"ID de pago guardado: \" + jsonData.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"contratoId\": {{contrato_id}},\n    \"arrendatarioId\": 1,\n    \"valor\": 1680000,\n    \"fecha\": \"2024-01-05\",\n    \"mesCorrespondiente\": \"2024-01-01\",\n    \"tipo\": \"ARRIENDO\",\n    \"estado\": \"PAGADO\",\n    \"metodoPago\": \"TRANSFERENCIA_BANCARIA\",\n    \"referenciaTransaccion\": \"TXN123456789\",\n    \"observaciones\": \"Pago completo enero 2024\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}:{{pagos_port}}/api/pagos",
+							"host": [
+								"{{base_url}}"
+							],
+							"port": "{{pagos_port}}",
+							"path": [
+								"api",
+								"pagos"
+							]
+						}
+					}
+				},
+				{
+					"name": "Historial Pagos por Contrato",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}:{{pagos_port}}/api/pagos?contrato={{contrato_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"port": "{{pagos_port}}",
+							"path": [
+								"api",
+								"pagos"
+							],
+							"query": [
+								{
+									"key": "contrato",
+									"value": "{{contrato_id}}"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Obtener Pago",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}:{{pagos_port}}/api/pagos/{{pago_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"port": "{{pagos_port}}",
+							"path": [
+								"api",
+								"pagos",
+								"{{pago_id}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "Pagos Pendientes",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}:{{pagos_port}}/api/pagos",
+							"host": [
+								"{{base_url}}"
+							],
+							"port": "{{pagos_port}}",
+							"path": [
+								"api",
+								"pagos"
+							]
+						}
+					}
+				},
+				{
+					"name": "Actualizar Estado Pago",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}:{{pagos_port}}/api/pagos/{{pago_id}}/estado?estado=PAGADO",
+							"host": [
+								"{{base_url}}"
+							],
+							"port": "{{pagos_port}}",
+							"path": [
+								"api",
+								"pagos",
+								"{{pago_id}}",
+								"estado"
+							],
+							"query": [
+								{
+									"key": "estado",
+									"value": "PAGADO"
+								}
+							]
+						}
+					}
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost"
+		}
+	]
+}

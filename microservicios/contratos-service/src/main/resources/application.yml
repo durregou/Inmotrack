@@ -1,0 +1,34 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: contratos-service
+  
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/arrendamiento_db}
+    username: ${SPRING_DATASOURCE_USERNAME:arrendamiento_user}
+    password: ${SPRING_DATASOURCE_PASSWORD:arrendamiento_pass}
+    driver-class-name: org.postgresql.Driver
+  
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    properties:
+      hibernate:
+        format_sql: true
+
+# URLs de otros microservicios
+propietarios:
+  service:
+    url: ${PROPIETARIOS_SERVICE_URL:http://localhost:8082}
+
+inmuebles:
+  service:
+    url: ${INMUEBLES_SERVICE_URL:http://localhost:8083}
+
+logging:
+  level:
+    com.arrendamiento.contratos: DEBUG
