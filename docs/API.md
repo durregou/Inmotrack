@@ -1,508 +1,866 @@
-# 📋 Documentación de APIs
+# 📡 API Documentation - Versión Completa
 
-Esta documentación describe todos los endpoints disponibles en los microservicios del sistema de arrendamiento.
+**Última actualización**: Octubre 2025  
+**Versión API**: 2.0.0  
+**GitHub**: [Inmotrack](https://github.com/durregou/Inmotrack)
 
-## 📖 Índice
-
-- [🔐 Administración Service](#-administración-service)
-- [👤 Propietarios Service](#-propietarios-service)
-- [🏠 Inmuebles Service](#-inmuebles-service)
-- [📋 Contratos Service](#-contratos-service)
-- [💰 Pagos Service](#-pagos-service)
+Documentación completa de todos los endpoints REST implementados.
 
 ---
 
-## 🔐 Administración Service
+## 📋 Índice
 
-**Base URL:** `http://localhost:8081`
-
-### Authentication
-
-#### Login de Administrador
-
-Autentica un administrador y retorna un token JWT.
-
-**Endpoint:** `POST /api/admin/login`
-
-**Request:**
-```json
-{
-    "correo": "admin@sistema.com",
-    "contrasena": "admin123"
-}
-```
-
-**Response (200 OK):**
-```json
-{
-    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-    "tipo": "Bearer",
-    "id": 1,
-    "nombre": "Administrador",
-    "correo": "admin@sistema.com"
-}
-```
-
-**Errores:**
-- `401 Unauthorized` - Credenciales incorrectas
-- `400 Bad Request` - Datos de entrada inválidos
-
-#### Consultar Administrador
-
-Obtiene la información de un administrador específico.
-
-**Endpoint:** `GET /api/admin/{id}`
-
-**Headers:**
-```
-Authorization: Bearer {jwt_token}
-```
-
-**Response (200 OK):**
-```json
-{
-    "id": 1,
-    "nombre": "Administrador",
-    "correo": "admin@sistema.com",
-    "telefono": "3001234567",
-    "activo": true
-}
-```
-
-**Errores:**
-- `404 Not Found` - Administrador no encontrado
-- `401 Unauthorized` - Token inválido
+- [Convenciones](#-convenciones)
+- [Usuarios Service](#-usuarios-service-8086)
+- [Inmuebles Service](#-inmuebles-service-8083)
+- [Contratos Service](#-contratos-service-8084)
+- [Pagos Service](#-pagos-service-8085)
+- [Mantenimiento Service](#-mantenimiento-service-8087)
+- [Notificaciones Service](#-notificaciones-service-8088)
+- [Propietarios Service](#-propietarios-service-8082)
+- [Códigos de Estado](#-códigos-de-estado)
 
 ---
 
-## 👤 Propietarios Service
+## 📌 Convenciones
 
-**Base URL:** `http://localhost:8082`
+### Base URL
+```
+http://localhost:{PORT}/api
+```
 
-### Gestión de Propietarios
+### Headers
+```http
+Content-Type: application/json
+Accept: application/json
+```
 
-#### Registrar Propietario
-
-Registra un nuevo propietario en el sistema.
-
-**Endpoint:** `POST /api/propietarios`
-
-**Request:**
+### Response Format
+**Success (200/201)**:
 ```json
 {
-    "nombre": "Juan Carlos",
-    "apellido": "Pérez López",
-    "correo": "juan.perez@email.com",
-    "contrasena": "password123",
-    "telefono": "3001234567",
-    "direccion": "Calle 123 #45-67, Bogotá",
-    "cedula": "12345678"
+  "id": 1,
+  "campo": "valor",
+  ...
 }
 ```
 
-**Response (201 Created):**
+**Error (400/404/500)**:
 ```json
 {
-    "id": 1,
-    "nombre": "Juan Carlos",
-    "apellido": "Pérez López",
-    "correo": "juan.perez@email.com",
-    "telefono": "3001234567",
-    "direccion": "Calle 123 #45-67, Bogotá",
-    "cedula": "12345678",
-    "fechaRegistro": "2024-01-15T10:30:00",
-    "activo": true
+  "error": "Mensaje de error",
+  "mensaje": "Detalles adicionales"
 }
 ```
-
-**Validaciones:**
-- `nombre`: Obligatorio, máximo 100 caracteres
-- `correo`: Obligatorio, formato email válido, único
-- `contrasena`: Obligatorio, mínimo 6 caracteres
-- `cedula`: Única (si se proporciona)
-
-**Errores:**
-- `400 Bad Request` - Email ya registrado o datos inválidos
-- `500 Internal Server Error` - Error del servidor
-
-#### Obtener Propietario
-
-Obtiene la información de un propietario específico.
-
-**Endpoint:** `GET /api/propietarios/{id}`
-
-**Response (200 OK):**
-```json
-{
-    "id": 1,
-    "nombre": "Juan Carlos",
-    "apellido": "Pérez López",
-    "correo": "juan.perez@email.com",
-    "telefono": "3001234567",
-    "direccion": "Calle 123 #45-67, Bogotá",
-    "cedula": "12345678",
-    "fechaRegistro": "2024-01-15T10:30:00",
-    "activo": true
-}
-```
-
-**Errores:**
-- `404 Not Found` - Propietario no encontrado
 
 ---
 
-## 🏠 Inmuebles Service
+## 👤 Usuarios Service (:8086)
 
-**Base URL:** `http://localhost:8083`
+### POST /api/usuarios/registro
+Registrar nuevo usuario
 
-### Gestión de Inmuebles
-
-#### Registrar Inmueble
-
-Registra un nuevo inmueble en el sistema.
-
-**Endpoint:** `POST /api/inmuebles`
-
-**Request:**
+**Request**:
 ```json
 {
-    "propietarioId": 1,
-    "tipo": "Apartamento",
-    "direccion": "Carrera 15 #85-42, Apto 501",
-    "ciudad": "Bogotá",
-    "departamento": "Cundinamarca",
-    "area": 85.5,
-    "habitaciones": 3,
-    "banos": 2,
-    "parqueaderos": 1,
-    "precioArriendo": 1500000,
-    "precioAdministracion": 180000,
-    "descripcion": "Apartamento moderno con excelente ubicación",
-    "amoblado": false,
-    "disponible": true
+  "nombre": "Juan",
+  "apellido": "Pérez",
+  "correo": "juan@example.com",
+  "contrasena": "password123",
+  "telefono": "3001234567",
+  "direccion": "Calle 123",
+  "cedula": "1234567890",
+  "tipoUsuario": "PROPIETARIO"
 }
 ```
 
-**Response (201 Created):**
+**Response 201**:
 ```json
 {
+  "mensaje": "Usuario registrado exitosamente",
+  "usuario": {
     "id": 1,
-    "propietarioId": 1,
-    "tipo": "Apartamento",
-    "direccion": "Carrera 15 #85-42, Apto 501",
-    "ciudad": "Bogotá",
-    "departamento": "Cundinamarca",
-    "area": 85.5,
-    "habitaciones": 3,
-    "banos": 2,
-    "parqueaderos": 1,
-    "precioArriendo": 1500000.00,
-    "precioAdministracion": 180000.00,
-    "descripcion": "Apartamento moderno con excelente ubicación",
-    "amoblado": false,
-    "disponible": true,
-    "fechaRegistro": "2024-01-15T10:30:00",
+    "nombre": "Juan",
+    "apellido": "Pérez",
+    "correo": "juan@example.com",
+    "tipoUsuario": "PROPIETARIO",
     "activo": true
+  }
 }
 ```
 
-#### Listar Inmuebles
+**Validaciones**:
+- Email único
+- Contraseña mínimo 6 caracteres
+- Tipo: ADMINISTRADOR | PROPIETARIO | ARRENDATARIO
 
-Lista inmuebles con filtros opcionales.
+---
 
-**Endpoint:** `GET /api/inmuebles`
+### POST /api/usuarios/login
+Autenticar usuario
 
-**Query Parameters:**
-- `tipo` - Filtrar por tipo de inmueble
-- `ciudad` - Filtrar por ciudad
-- `propietarioId` - Filtrar por propietario
-- `todos=true` - Incluir inmuebles no disponibles
-
-**Ejemplos:**
-```bash
-GET /api/inmuebles                           # Solo disponibles y activos
-GET /api/inmuebles?tipo=Apartamento          # Apartamentos disponibles
-GET /api/inmuebles?ciudad=Bogotá            # Inmuebles en Bogotá
-GET /api/inmuebles?propietarioId=1          # Inmuebles de un propietario
-GET /api/inmuebles?todos=true               # Todos los inmuebles
+**Request**:
+```json
+{
+  "correo": "admin@sistema.com",
+  "contrasena": "admin123"
+}
 ```
 
-**Response (200 OK):**
+**Response 200**:
+```json
+{
+  "id": 5,
+  "nombre": "Admin",
+  "apellido": "Sistema",
+  "correo": "admin@sistema.com",
+  "tipoUsuario": "ADMINISTRADOR",
+  "activo": true
+}
+```
+
+**Response 401 (Error)**:
+```json
+{
+  "error": "Credenciales inválidas"
+}
+```
+
+---
+
+### GET /api/usuarios/{id}
+Obtener usuario por ID
+
+**Response 200**:
+```json
+{
+  "id": 1,
+  "nombre": "Juan",
+  "apellido": "Pérez",
+  "correo": "juan@example.com",
+  "telefono": "3001234567",
+  "direccion": "Calle 123",
+  "cedula": "1234567890",
+  "tipoUsuario": "PROPIETARIO",
+  "activo": true,
+  "fechaRegistro": "2025-10-04T10:00:00"
+}
+```
+
+---
+
+### GET /api/usuarios?tipo={TIPO}
+Filtrar usuarios por tipo
+
+**Parámetros Query**:
+- `tipo`: ADMINISTRADOR | PROPIETARIO | ARRENDATARIO
+
+**Response 200**:
 ```json
 [
-    {
-        "id": 1,
-        "propietarioId": 1,
-        "tipo": "Apartamento",
-        "direccion": "Carrera 15 #85-42, Apto 501",
-        "ciudad": "Bogotá",
-        "precioArriendo": 1500000.00,
-        "disponible": true,
-        // ... más campos
-    }
+  {
+    "id": 1,
+    "nombre": "Juan",
+    "tipoUsuario": "PROPIETARIO"
+  },
+  ...
 ]
 ```
 
-#### Obtener Inmueble
+---
 
-Obtiene un inmueble específico.
+### PUT /api/usuarios/{id}/activar
+Activar usuario
 
-**Endpoint:** `GET /api/inmuebles/{id}`
-
-#### Actualizar Disponibilidad
-
-Actualiza la disponibilidad de un inmueble.
-
-**Endpoint:** `PUT /api/inmuebles/{id}/disponibilidad`
-
-**Query Parameters:**
-- `disponible` - true/false
-
-**Ejemplo:**
-```bash
-PUT /api/inmuebles/1/disponibilidad?disponible=false
+**Response 200**:
+```json
+{
+  "mensaje": "Usuario activado exitosamente"
+}
 ```
 
 ---
 
-## 📋 Contratos Service
+### PUT /api/usuarios/{id}/desactivar
+Desactivar usuario
 
-**Base URL:** `http://localhost:8084`
-
-### Gestión de Contratos
-
-#### Crear Contrato
-
-Crea un nuevo contrato de arrendamiento.
-
-**Endpoint:** `POST /api/contratos`
-
-**Request:**
+**Response 200**:
 ```json
 {
-    "inmuebleId": 1,
-    "propietarioId": 1,
-    "arrendatarioId": 1,
-    "fechaInicio": "2024-01-01",
-    "fechaFin": "2024-12-31",
-    "valorArriendo": 1500000,
-    "valorAdministracion": 180000,
-    "deposito": 1500000,
-    "diaPago": 5,
-    "observaciones": "Contrato de arrendamiento estándar"
+  "mensaje": "Usuario desactivado exitosamente"
 }
 ```
 
-**Response (201 Created):**
+---
+
+## 🏠 Inmuebles Service (:8083)
+
+### POST /api/inmuebles
+Crear nuevo inmueble
+
+**Request**:
 ```json
 {
+  "propietarioId": 1,
+  "tipo": "APARTAMENTO",
+  "direccion": "Carrera 10 #20-30",
+  "ciudad": "Bogotá",
+  "departamento": "Cundinamarca",
+  "area": 65.5,
+  "habitaciones": 2,
+  "banos": 1,
+  "parqueaderos": 1,
+  "precioArriendo": 1500000,
+  "precioAdministracion": 200000,
+  "descripcion": "Apartamento amplio y luminoso",
+  "amoblado": false
+}
+```
+
+**Response 201**:
+```json
+{
+  "id": 1,
+  "propietarioId": 1,
+  "tipo": "APARTAMENTO",
+  "direccion": "Carrera 10 #20-30",
+  "ciudad": "Bogotá",
+  "precioArriendo": 1500000,
+  "disponible": true,
+  "activo": true,
+  "fechaRegistro": "2025-10-04T10:00:00"
+}
+```
+
+**Tipos válidos**: APARTAMENTO | CASA | LOCAL | OFICINA | BODEGA
+
+---
+
+### GET /api/inmuebles
+Listar todos los inmuebles
+
+**Response 200**:
+```json
+[
+  {
     "id": 1,
-    "inmuebleId": 1,
-    "propietarioId": 1,
-    "arrendatarioId": 1,
-    "fechaInicio": "2024-01-01",
-    "fechaFin": "2024-12-31",
-    "valorArriendo": 1500000.00,
-    "valorAdministracion": 180000.00,
-    "deposito": 1500000.00,
-    "diaPago": 5,
-    "estado": "ACTIVO",
-    "observaciones": "Contrato de arrendamiento estándar",
-    "fechaCreacion": "2024-01-15T10:30:00",
-    "activo": true
+    "tipo": "APARTAMENTO",
+    "direccion": "Carrera 10 #20-30",
+    "ciudad": "Bogotá",
+    "precioArriendo": 1500000,
+    "disponible": true
+  },
+  ...
+]
+```
+
+---
+
+### GET /api/inmuebles/{id}
+Obtener inmueble por ID
+
+**Response 200**:
+```json
+{
+  "id": 1,
+  "propietarioId": 1,
+  "tipo": "APARTAMENTO",
+  "direccion": "Carrera 10 #20-30",
+  "ciudad": "Bogotá",
+  "departamento": "Cundinamarca",
+  "area": 65.5,
+  "habitaciones": 2,
+  "banos": 1,
+  "parqueaderos": 1,
+  "precioArriendo": 1500000,
+  "precioAdministracion": 200000,
+  "descripcion": "Apartamento amplio",
+  "amoblado": false,
+  "disponible": true,
+  "activo": true,
+  "fechaRegistro": "2025-10-04T10:00:00"
 }
 ```
 
-**Validaciones:**
-- El inmueble debe estar disponible
-- El propietario debe existir
-- No puede haber otro contrato activo para el mismo inmueble
-- `fechaFin` debe ser posterior a `fechaInicio`
+---
 
-#### Consultar Contrato
+### GET /api/inmuebles?propietarioId={id}
+Filtrar inmuebles por propietario
 
-**Endpoint:** `GET /api/contratos/{id}`
+**Response 200**: Array de inmuebles
 
-#### Listar Contratos
+---
 
-**Endpoint:** `GET /api/contratos`
+### PUT /api/inmuebles/{id}
+**✨ NUEVO** - Actualizar inmueble completo
 
-**Query Parameters:**
-- `propietarioId` - Contratos de un propietario
-- `arrendatarioId` - Contratos de un arrendatario
-- `inmuebleId` - Contratos de un inmueble
-- `soloActivos=true` - Solo contratos activos
-
-#### Finalizar Contrato
-
-Finaliza un contrato y marca el inmueble como disponible.
-
-**Endpoint:** `PUT /api/contratos/{id}/finalizar`
-
-**Response (200 OK):**
+**Request**:
 ```json
 {
+  "propietarioId": 1,
+  "tipo": "APARTAMENTO",
+  "direccion": "Carrera 10 #20-30 ACTUALIZADO",
+  "ciudad": "Bogotá",
+  "area": 70.0,
+  "habitaciones": 3,
+  "banos": 2,
+  "precioArriendo": 1800000,
+  "descripcion": "Descripción actualizada",
+  "disponible": true
+}
+```
+
+**Response 200**: Inmueble actualizado
+
+---
+
+### PUT /api/inmuebles/{id}/disponibilidad
+Cambiar solo disponibilidad
+
+**Request**:
+```json
+{
+  "disponible": false
+}
+```
+
+**Response 200**: Inmueble actualizado
+
+---
+
+### DELETE /api/inmuebles/{id}
+**✨ NUEVO** - Eliminar inmueble
+
+**Response 200**:
+```json
+{
+  "mensaje": "Inmueble eliminado exitosamente"
+}
+```
+
+**Validación**: No se puede eliminar si tiene contrato activo
+
+---
+
+## 📄 Contratos Service (:8084)
+
+### POST /api/contratos
+Crear nuevo contrato
+
+**Request**:
+```json
+{
+  "inmuebleId": 1,
+  "propietarioId": 1,
+  "arrendatarioId": 7,
+  "fechaInicio": "2025-01-01",
+  "fechaFin": "2025-12-31",
+  "valorArriendo": 1500000,
+  "valorAdministracion": 200000,
+  "deposito": 1500000,
+  "diaPago": 5,
+  "observaciones": "Contrato de 1 año"
+}
+```
+
+**Response 201**:
+```json
+{
+  "id": 1,
+  "inmuebleId": 1,
+  "propietarioId": 1,
+  "arrendatarioId": 7,
+  "fechaInicio": "2025-01-01",
+  "fechaFin": "2025-12-31",
+  "valorArriendo": 1500000,
+  "estado": "ACTIVO",
+  "fechaCreacion": "2025-10-04T10:00:00"
+}
+```
+
+**Lógica de Negocio**:
+- Valida que inmueble esté disponible
+- Marca inmueble como NO disponible
+- Valida fechaFin > fechaInicio
+
+---
+
+### GET /api/contratos/{id}
+Obtener contrato por ID
+
+**Response 200**: Objeto contrato completo
+
+---
+
+### GET /api/contratos?propietarioId={id}
+Filtrar contratos por propietario
+
+---
+
+### GET /api/contratos?arrendatarioId={id}
+Filtrar contratos por arrendatario
+
+---
+
+### GET /api/contratos?inmuebleId={id}
+Filtrar contratos por inmueble
+
+---
+
+### PUT /api/contratos/{id}
+**✨ NUEVO** - Actualizar contrato
+
+**Request**:
+```json
+{
+  "fechaInicio": "2025-01-01",
+  "fechaFin": "2026-01-01",
+  "valorArriendo": 1600000,
+  "valorAdministracion": 220000,
+  "observaciones": "Extensión de contrato"
+}
+```
+
+**Response 200**: Contrato actualizado
+
+---
+
+### PUT /api/contratos/{id}/finalizar
+**✨ IMPLEMENTADO HOY** - Finalizar contrato
+
+**Request**: Vacío `{}`
+
+**Response 200**:
+```json
+{
+  "id": 1,
+  "estado": "FINALIZADO",
+  "mensaje": "Contrato finalizado. Inmueble ahora disponible."
+}
+```
+
+**Lógica de Negocio**:
+1. Cambia estado a FINALIZADO
+2. Marca inmueble como disponible
+3. Valida que no esté ya finalizado
+
+---
+
+### DELETE /api/contratos/{id}
+**✨ NUEVO** - Eliminar contrato
+
+**Response 200**:
+```json
+{
+  "mensaje": "Contrato eliminado exitosamente"
+}
+```
+
+---
+
+## 💰 Pagos Service (:8085)
+
+### POST /api/pagos
+Registrar nuevo pago
+
+**Request**:
+```json
+{
+  "contratoId": 1,
+  "arrendatarioId": 7,
+  "fecha": "2025-10-04",
+  "valor": 1500000,
+  "metodoPago": "TRANSFERENCIA",
+  "mesCorrespondiente": "Octubre 2025",
+  "comprobante": "TRF-001234",
+  "observaciones": "Pago puntual"
+}
+```
+
+**Response 201**:
+```json
+{
+  "id": 1,
+  "contratoId": 1,
+  "arrendatarioId": 7,
+  "fecha": "2025-10-04",
+  "valor": 1500000,
+  "metodoPago": "TRANSFERENCIA",
+  "estado": "PENDIENTE",
+  "fechaRegistro": "2025-10-04T10:00:00"
+}
+```
+
+**Métodos de Pago**: EFECTIVO | TRANSFERENCIA | TARJETA | CHEQUE
+
+---
+
+### GET /api/pagos
+Listar todos los pagos
+
+---
+
+### GET /api/pagos?contrato={id}
+Filtrar pagos por contrato
+
+---
+
+### GET /api/pagos?arrendatario={id}
+Filtrar pagos por arrendatario
+
+---
+
+### PUT /api/pagos/{id}/estado?estado={ESTADO}
+**✨ IMPLEMENTADO HOY** - Cambiar estado de pago
+
+**Parámetros Query**:
+- `estado`: PENDIENTE | PAGADO | VENCIDO | PARCIAL
+
+**Response 200**:
+```json
+{
+  "id": 1,
+  "estado": "PAGADO",
+  "mensaje": "Estado actualizado exitosamente"
+}
+```
+
+**Validaciones**:
+- No cambiar de PAGADO a otro estado
+- Admin only (validación en UI)
+
+---
+
+## 🔧 Mantenimiento Service (:8087)
+
+### POST /api/mantenimiento
+Crear solicitud de mantenimiento
+
+**Request**:
+```json
+{
+  "inmuebleId": 1,
+  "solicitanteId": 7,
+  "titulo": "Fuga de agua en baño",
+  "descripcion": "Hay una fuga en la tubería del baño principal",
+  "tipo": "PLOMERIA",
+  "prioridad": "ALTA"
+}
+```
+
+**Response 201**:
+```json
+{
+  "id": 1,
+  "inmuebleId": 1,
+  "solicitanteId": 7,
+  "titulo": "Fuga de agua en baño",
+  "tipo": "PLOMERIA",
+  "prioridad": "ALTA",
+  "estado": "PENDIENTE",
+  "fechaSolicitud": "2025-10-04T10:00:00"
+}
+```
+
+**Tipos**: PLOMERIA | ELECTRICO | PINTURA | LIMPIEZA | OTRO  
+**Prioridad**: BAJA | MEDIA | ALTA | URGENTE
+
+---
+
+### GET /api/mantenimiento
+Listar todas las solicitudes
+
+---
+
+### GET /api/mantenimiento?solicitante={id}
+Filtrar por solicitante
+
+---
+
+### GET /api/mantenimiento?inmueble={id}
+Filtrar por inmueble
+
+---
+
+### PUT /api/mantenimiento/{id}
+**✨ NUEVO** - Actualizar solicitud
+
+**Request**:
+```json
+{
+  "titulo": "Título actualizado",
+  "descripcion": "Descripción actualizada",
+  "tipo": "ELECTRICO",
+  "prioridad": "URGENTE",
+  "tecnico": "Juan Técnico",
+  "costoEstimado": 150000,
+  "observaciones": "Requiere materiales especiales"
+}
+```
+
+**Response 200**: Solicitud actualizada
+
+---
+
+### PUT /api/mantenimiento/{id}/aprobar
+**✨ IMPLEMENTADO HOY** - Aprobar solicitud
+
+**Request**: Vacío `{}`
+
+**Response 200**:
+```json
+{
+  "id": 1,
+  "estado": "APROBADO",
+  "mensaje": "Solicitud aprobada"
+}
+```
+
+**Validación**: Solo si estado es PENDIENTE
+
+---
+
+### PUT /api/mantenimiento/{id}/iniciar
+**✨ IMPLEMENTADO HOY** - Iniciar trabajo
+
+**Request**: Vacío `{}`
+
+**Response 200**:
+```json
+{
+  "id": 1,
+  "estado": "EN_PROCESO",
+  "mensaje": "Trabajo iniciado"
+}
+```
+
+**Validación**: Solo si estado es APROBADO
+
+---
+
+### PUT /api/mantenimiento/{id}/completar
+**✨ IMPLEMENTADO HOY** - Completar trabajo
+
+**Request**:
+```json
+{
+  "costoReal": 180000,
+  "observaciones": "Trabajo completado satisfactoriamente"
+}
+```
+
+**Response 200**:
+```json
+{
+  "id": 1,
+  "estado": "COMPLETADO",
+  "costoReal": 180000,
+  "fechaCompletado": "2025-10-04T15:00:00",
+  "mensaje": "Trabajo completado"
+}
+```
+
+**Validación**: Solo si estado es EN_PROCESO
+
+---
+
+### PUT /api/mantenimiento/{id}/rechazar
+**✨ IMPLEMENTADO HOY** - Rechazar solicitud
+
+**Request**:
+```json
+{
+  "motivo": "Solicitud fuera de cobertura del contrato"
+}
+```
+
+**Response 200**:
+```json
+{
+  "id": 1,
+  "estado": "RECHAZADO",
+  "observaciones": "Solicitud fuera de cobertura del contrato",
+  "mensaje": "Solicitud rechazada"
+}
+```
+
+**Validación**: Solo si estado es PENDIENTE o APROBADO
+
+---
+
+## 📬 Notificaciones Service (:8088)
+
+### POST /api/notificaciones
+Crear notificación
+
+**Request**:
+```json
+{
+  "destinatario": "inquilino@test.com",
+  "asunto": "Recordatorio de Pago",
+  "mensaje": "Su pago del mes de octubre vence el día 5",
+  "tipo": "EMAIL",
+  "contratoId": 1,
+  "pagoId": null
+}
+```
+
+**Response 201**:
+```json
+{
+  "id": 1,
+  "destinatario": "inquilino@test.com",
+  "asunto": "Recordatorio de Pago",
+  "tipo": "EMAIL",
+  "estado": "PENDIENTE",
+  "fechaCreacion": "2025-10-04T10:00:00"
+}
+```
+
+**Tipos**: EMAIL | SMS | WHATSAPP  
+**Estados**: PENDIENTE | ENVIADO | FALLIDO
+
+---
+
+### GET /api/notificaciones
+Listar todas las notificaciones
+
+---
+
+### GET /api/notificaciones?destinatario={email}
+Filtrar por destinatario
+
+**Response 200**:
+```json
+[
+  {
     "id": 1,
-    "estado": "FINALIZADO",
-    // ... otros campos
+    "asunto": "Recordatorio de Pago",
+    "mensaje": "Su pago...",
+    "tipo": "EMAIL",
+    "estado": "ENVIADO",
+    "fechaCreacion": "2025-10-04T10:00:00",
+    "fechaEnvio": "2025-10-04T10:01:00"
+  },
+  ...
+]
+```
+
+---
+
+### GET /api/notificaciones/{id}
+Obtener notificación por ID
+
+---
+
+## 🏢 Propietarios Service (:8082)
+
+### POST /api/propietarios
+Crear propietario
+
+**Request**:
+```json
+{
+  "nombre": "Carlos",
+  "apellido": "López",
+  "cedula": "9876543210",
+  "telefono": "3009876543",
+  "email": "carlos@example.com"
 }
 ```
 
 ---
 
-## 💰 Pagos Service
-
-**Base URL:** `http://localhost:8085`
-
-### Gestión de Pagos
-
-#### Registrar Pago
-
-Registra un nuevo pago.
-
-**Endpoint:** `POST /api/pagos`
-
-**Request:**
-```json
-{
-    "contratoId": 1,
-    "arrendatarioId": 1,
-    "valor": 1680000,
-    "fecha": "2024-01-05",
-    "mesCorrespondiente": "2024-01-01",
-    "tipo": "ARRIENDO",
-    "estado": "PAGADO",
-    "metodoPago": "TRANSFERENCIA_BANCARIA",
-    "referenciaTransaccion": "TXN123456789",
-    "observaciones": "Pago completo enero 2024"
-}
-```
-
-**Tipos de Pago:**
-- `ARRIENDO`, `ADMINISTRACION`, `DEPOSITO`, `MORA`, `SERVICIOS_PUBLICOS`, `OTROS`
-
-**Estados de Pago:**
-- `PENDIENTE`, `PAGADO`, `VENCIDO`, `PARCIAL`
-
-**Métodos de Pago:**
-- `EFECTIVO`, `TRANSFERENCIA_BANCARIA`, `CHEQUE`, `TARJETA_CREDITO`, `TARJETA_DEBITO`, `PSE`, `NEQUI`, `DAVIPLATA`
-
-#### Historial de Pagos
-
-**Endpoint:** `GET /api/pagos`
-
-**Query Parameters:**
-- `contrato={id}` - Historial de pagos por contrato
-- `arrendatario={id}` - Pagos de un arrendatario
-- `estado={estado}` - Filtrar por estado
-- `tipo={tipo}` - Filtrar por tipo
-- `year={año}&month={mes}` - Pagos de un mes específico
-- `vencidos=true` - Pagos vencidos
-- `porVencerEnDias={días}` - Pagos que vencen en X días
-
-**Ejemplos:**
-```bash
-GET /api/pagos?contrato=1                    # Historial por contrato
-GET /api/pagos?arrendatario=1               # Pagos de arrendatario
-GET /api/pagos?estado=PENDIENTE             # Pagos pendientes
-GET /api/pagos?vencidos=true                # Pagos vencidos
-GET /api/pagos?year=2024&month=1            # Pagos de enero 2024
-```
-
-#### Actualizar Estado de Pago
-
-**Endpoint:** `PUT /api/pagos/{id}/estado`
-
-**Query Parameters:**
-- `estado` - Nuevo estado del pago
-
-**Ejemplo:**
-```bash
-PUT /api/pagos/1/estado?estado=PAGADO
-```
-
-#### Contar Pagos Pendientes
-
-**Endpoint:** `GET /api/pagos/contrato/{contratoId}/pendientes/count`
-
-**Response:**
-```json
-{
-    "count": 3
-}
-```
+### GET /api/propietarios/{id}
+Obtener propietario por ID
 
 ---
 
-## 🔧 Códigos de Respuesta HTTP
+## ⚠️ Códigos de Estado
 
-| Código | Descripción | Cuándo se usa |
+| Código | Significado | Cuándo se usa |
 |--------|-------------|---------------|
-| 200 OK | Éxito | GET, PUT exitosos |
-| 201 Created | Creado | POST exitosos |
-| 400 Bad Request | Datos inválidos | Validación fallida |
-| 401 Unauthorized | No autorizado | Token inválido/faltante |
-| 404 Not Found | No encontrado | Recurso inexistente |
-| 500 Internal Server Error | Error servidor | Error inesperado |
+| 200 | OK | Operación exitosa (GET, PUT, DELETE) |
+| 201 | Created | Recurso creado exitosamente (POST) |
+| 400 | Bad Request | Datos inválidos o faltantes |
+| 401 | Unauthorized | Credenciales incorrectas |
+| 404 | Not Found | Recurso no encontrado |
+| 405 | Method Not Allowed | Método HTTP no soportado |
+| 409 | Conflict | Conflicto (ej: email ya existe) |
+| 500 | Internal Server Error | Error del servidor |
 
-## 🔍 Headers Comunes
+---
 
-### Request Headers
-```
-Content-Type: application/json
-Authorization: Bearer {jwt_token}  # Solo para endpoints protegidos
-```
+## 📊 Ejemplos de Uso Completos
 
-### Response Headers
-```
-Content-Type: application/json
-X-Request-ID: {unique_id}  # Para rastreo de requests
-```
-
-## 📱 Ejemplos de Uso con curl
-
-### Flujo Completo
+### Flujo Completo: Crear Contrato
 
 ```bash
-# 1. Registrar propietario
-curl -X POST http://localhost:8082/api/propietarios \
+# 1. Crear usuario arrendatario
+curl -X POST http://localhost:8086/api/usuarios/registro \
   -H "Content-Type: application/json" \
-  -d '{"nombre":"Juan","apellido":"Pérez","correo":"juan@email.com","contrasena":"123456"}'
+  -d '{
+    "nombre": "María",
+    "apellido": "González",
+    "correo": "maria@example.com",
+    "contrasena": "maria123",
+    "tipoUsuario": "ARRENDATARIO"
+  }'
 
-# 2. Crear inmueble
+# 2. Crear inmueble (propietario)
 curl -X POST http://localhost:8083/api/inmuebles \
   -H "Content-Type: application/json" \
-  -d '{"propietarioId":1,"tipo":"Casa","direccion":"Calle 123","precioArriendo":1000000}'
+  -d '{
+    "propietarioId": 1,
+    "tipo": "APARTAMENTO",
+    "direccion": "Calle 50 #10-20",
+    "ciudad": "Bogotá",
+    "precioArriendo": 1200000,
+    "habitaciones": 2,
+    "banos": 1
+  }'
 
 # 3. Crear contrato
 curl -X POST http://localhost:8084/api/contratos \
   -H "Content-Type: application/json" \
-  -d '{"inmuebleId":1,"propietarioId":1,"arrendatarioId":1,"fechaInicio":"2024-01-01","fechaFin":"2024-12-31","valorArriendo":1000000}'
+  -d '{
+    "inmuebleId": 1,
+    "propietarioId": 1,
+    "arrendatarioId": 1,
+    "fechaInicio": "2025-11-01",
+    "fechaFin": "2026-11-01",
+    "valorArriendo": 1200000,
+    "diaPago": 5
+  }'
 
-# 4. Registrar pago
+# 4. Registrar primer pago
 curl -X POST http://localhost:8085/api/pagos \
   -H "Content-Type: application/json" \
-  -d '{"contratoId":1,"arrendatarioId":1,"valor":1000000,"fecha":"2024-01-05","mesCorrespondiente":"2024-01-01"}'
+  -d '{
+    "contratoId": 1,
+    "arrendatarioId": 1,
+    "fecha": "2025-11-05",
+    "valor": 1200000,
+    "metodoPago": "TRANSFERENCIA",
+    "mesCorrespondiente": "Noviembre 2025"
+  }'
+
+# 5. Marcar pago como pagado (Admin)
+curl -X PUT "http://localhost:8085/api/pagos/1/estado?estado=PAGADO" \
+  -H "Content-Type: application/json"
 ```
-
-## ⚠️ Limitaciones y Consideraciones
-
-### Rate Limiting
-- Máximo 100 requests por minuto por IP
-- Máximo 1000 requests por hora por token JWT
-
-### Tamaño de Requests
-- Máximo 1MB por request
-- Máximo 50 items en arrays
-
-### Paginación
-- Límite por defecto: 20 items
-- Máximo: 100 items por página
-
-### Cache
-- Responses GET cacheadas por 5 minutos
-- Headers: `Cache-Control: public, max-age=300`
 
 ---
 
-Para más información, ver la [colección de Postman](../microservicios/postman-config/) con ejemplos completos.
+## 🔗 Referencias
+
+- **GitHub**: [https://github.com/durregou/Inmotrack](https://github.com/durregou/Inmotrack)
+- **Documentación Técnica**: [../DOCUMENTACION.md](../DOCUMENTACION.md)
+- **Arquitectura**: [./ARCHITECTURE.md](./ARCHITECTURE.md)
+- **Postman Collection**: Importar desde `/microservicios/postman-config/`
+
+---
+
+**Autor**: [David Urrego](https://github.com/durregou)  
+**Última actualización**: Octubre 2025  
+**Total de Endpoints**: 52 endpoints implementados

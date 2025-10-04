@@ -1,428 +1,526 @@
-# 🏛️ Guía de Arquitectura
+# 🏛️ Guía de Arquitectura Actualizada
 
-Esta documentación describe la arquitectura del sistema de gestión de arrendamientos, patrones de diseño implementados y decisiones técnicas.
+**Última actualización**: Octubre 2025  
+**Versión**: 2.0.0  
+**GitHub**: [Inmotrack](https://github.com/durregou/Inmotrack)
+
+Esta documentación describe la arquitectura completa del sistema con todas las implementaciones actuales.
+
+---
 
 ## 📋 Índice
 
 - [🎯 Visión General](#-visión-general)
-- [🏗️ Arquitectura de Microservicios](#️-arquitectura-de-microservicios)
+- [🏗️ Arquitectura Completa](#️-arquitectura-completa)
+- [🎨 Capa de Presentación](#-capa-de-presentación)
+- [⚙️ Microservicios Backend](#️-microservicios-backend)
 - [💾 Arquitectura de Datos](#-arquitectura-de-datos)
 - [🔄 Patrones de Diseño](#-patrones-de-diseño)
-- [🔗 Comunicación Entre Servicios](#-comunicación-entre-servicios)
+- [🔗 Comunicación](#-comunicación)
 - [🛡️ Seguridad](#️-seguridad)
-- [📈 Escalabilidad](#-escalabilidad)
 
 ---
 
 ## 🎯 Visión General
 
+### Arquitectura Híbrida: Desktop + Microservicios
+
+El sistema implementa una arquitectura **híbrida** que combina:
+- **Frontend**: Java Swing (Desktop Application)
+- **Backend**: Microservicios Spring Boot
+- **Base de Datos**: PostgreSQL Centralizado
+- **Contenedores**: Docker + Docker Compose
+
 ### Principios Arquitectónicos
 
-El sistema está diseñado siguiendo estos principios fundamentales:
+1. ✅ **Separación de Responsabilidades**: UI, Lógica de Negocio, Datos
+2. ✅ **Microservicios Independientes**: 8 servicios especializados
+3. ✅ **REST API First**: Todas las operaciones vía HTTP
+4. ✅ **Stateless**: No hay estado en el servidor (sesión en cliente)
+5. ✅ **Containerizado**: Todo corre en Docker para portabilidad
 
-1. **Single Responsibility**: Cada microservicio tiene una responsabilidad específica
-2. **Loose Coupling**: Servicios independientes con mínimas dependencias
-3. **High Cohesion**: Funcionalidades relacionadas agrupadas lógicamente
-4. **Database per Service**: Cada servicio gestiona sus propios datos
-5. **API First**: Interfaces bien definidas antes de la implementación
+---
 
-### Stack Tecnológico
+## 🏗️ Arquitectura Completa
 
-```mermaid
-graph TB
-    subgraph "Frontend Layer"
-        A[React/Angular] --> B[API Gateway]
-    end
-    
-    subgraph "Application Layer"
-        B --> C[Administración Service]
-        B --> D[Propietarios Service]
-        B --> E[Inmuebles Service]
-        B --> F[Contratos Service]
-        B --> G[Pagos Service]
-    end
-    
-    subgraph "Infrastructure Layer"
-        C --> H[(PostgreSQL)]
-        D --> H
-        E --> H
-        F --> H
-        G --> H
-    end
-    
-    subgraph "Cross-Cutting Concerns"
-        I[Logging]
-        J[Monitoring]
-        K[Security]
-        L[Configuration]
-    end
+### Diagrama de Alto Nivel
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                 CAPA DE PRESENTACIÓN                         │
+│             Java Swing Desktop Application                    │
+│  ┌──────────────┐ ┌──────────────┐ ┌──────────────────┐    │
+│  │  frmlogin    │ │ frmadmin     │ │ frmpropietario/  │    │
+│  │              │→│              │ │ frmarrendatario  │    │
+│  └──────────────┘ └──────────────┘ └──────────────────┘    │
+│         ↓                                                     │
+│    ApiClient.java (HTTP Client)                              │
+│    SesionUsuario.java (Session Singleton)                    │
+└────────────────────────┬────────────────────────────────────┘
+                         │ REST API (HTTP/JSON)
+                         ▼
+┌─────────────────────────────────────────────────────────────┐
+│              CAPA DE MICROSERVICIOS (8 Servicios)            │
+├────────────────┬────────────────┬───────────────────────────┤
+│ Usuarios       │ Inmuebles      │ Contratos                 │
+│ :8086          │ :8083          │ :8084                     │
+│ • Login        │ • CRUD Completo│ • CRUD Completo           │
+│ • Registro     │ • Editar       │ • Editar                  │
+│ • Activar/     │ • Eliminar     │ • Eliminar                │
+│   Desactivar   │ • Filtros      │ • Finalizar               │
+├────────────────┼────────────────┼───────────────────────────┤
+│ Pagos          │ Mantenimiento  │ Notificaciones            │
+│ :8085          │ :8087          │ :8088                     │
+│ • Registro     │ • Solicitudes  │ • Envío Masivo            │
+│ • Cambiar      │ • Aprobar      │ • EMAIL/SMS               │
+│   Estado       │ • Iniciar      │ • Historial               │
+│ • Marcar       │ • Completar    │                           │
+│   Pagado/      │ • Rechazar     │                           │
+│   Vencido      │                │                           │
+├────────────────┼────────────────┼───────────────────────────┤
+│ Propietarios   │ Reportes       │                           │
+│ :8082          │ :8089          │                           │
+│ • Gestión      │ • Rentabilidad │                           │
+│   Básica       │ • Ocupación    │                           │
+│                │ • Mantenimiento│                           │
+└────────────────┴────────────────┴───────────────────────────┘
+                         │
+                         ▼
+┌─────────────────────────────────────────────────────────────┐
+│                   CAPA DE DATOS                              │
+│              PostgreSQL Database :5432                        │
+│  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐       │
+│  │ usuarios │ │inmuebles │ │contratos │ │  pagos   │       │
+│  └──────────┘ └──────────┘ └──────────┘ └──────────┘       │
+│  ┌──────────┐ ┌──────────────────────┐ ┌──────────┐       │
+│  │mantenim. │ │   notificaciones     │ │propietar.│       │
+│  └──────────┘ └──────────────────────┘ └──────────┘       │
+└─────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 🏗️ Arquitectura de Microservicios
+## 🎨 Capa de Presentación
 
-### Diagrama de Componentes
+### Java Swing Application
 
-```mermaid
-graph LR
-    subgraph "Client Layer"
-        CLI[Postman/Frontend]
-    end
-    
-    subgraph "API Gateway" 
-        GW[Gateway<br/>Future]
-    end
-    
-    subgraph "Business Services"
-        ADM[Administración<br/>:8081]
-        PROP[Propietarios<br/>:8082]
-        INM[Inmuebles<br/>:8083]
-        CONT[Contratos<br/>:8084]
-        PAG[Pagos<br/>:8085]
-    end
-    
-    subgraph "Data Layer"
-        DB[(PostgreSQL<br/>:5432)]
-    end
-    
-    CLI --> GW
-    GW --> ADM
-    GW --> PROP  
-    GW --> INM
-    GW --> CONT
-    GW --> PAG
-    
-    CONT --> PROP
-    CONT --> INM
-    PAG --> CONT
-    
-    ADM --> DB
-    PROP --> DB
-    INM --> DB
-    CONT --> DB
-    PAG --> DB
+#### Estructura de Clases
+
+```
+src/Principal/
+├── frmlogin.java                 # Login + Registro + Recuperar Contraseña
+├── frmadministrador.java         # Panel Admin (7 tabs)
+├── frmpropietario.java           # Panel Propietario (5 tabs)
+├── frmarrendatario.java          # Panel Arrendatario (5 tabs)
+├── ApiClient.java                # Cliente HTTP REST
+├── SesionUsuario.java            # Singleton de Sesión
+└── Validador.java                # Validaciones de Formularios
 ```
 
-### Responsabilidades por Servicio
+#### Funcionalidades Principales
 
-| Servicio | Responsabilidades | Dependencias |
-|----------|-------------------|--------------|
-| **Administración** | • Autenticación JWT<br/>• Gestión de administradores<br/>• Autorización | Ninguna |
-| **Propietarios** | • CRUD de propietarios<br/>• Validación de datos<br/>• Encriptación de contraseñas | Ninguna |
-| **Inmuebles** | • Catálogo de propiedades<br/>• Búsquedas y filtros<br/>• Gestión de disponibilidad | Ninguna |
-| **Contratos** | • Contratos de arrendamiento<br/>• Validaciones de negocio<br/>• Estados del contrato | Propietarios, Inmuebles |
-| **Pagos** | • Registro de pagos<br/>• Historial financiero<br/>• Estados de pagos | Contratos |
+**frmlogin**:
+- ✅ Login con validación
+- ✅ Registro de nuevos usuarios
+- ✅ Recuperar contraseña (envía notificación)
+- ✅ Validación de campos
+- ✅ Redirección según rol
 
-### Beneficios de la Arquitectura
+**frmadministrador** (7 pestañas):
+1. **DASHBOARD**: Estadísticas en tiempo real (6 métricas)
+2. **USUARIOS**: CRUD completo + Activar/Desactivar
+3. **CONTRATOS**: CRUD + Ver Detalle + Finalizar
+4. **PAGOS**: Ver Detalle + Cambiar Estado + Marcar Pagado/Vencido
+5. **INMUEBLES**: CRUD completo + Ver Detalle
+6. **MANTENIMIENTO**: Aprobar/Iniciar/Completar/Rechazar + Ver Detalle
+7. **MI PERFIL**: Editar datos personales
 
-#### ✅ Ventajas
+**frmpropietario** (5 pestañas):
+1. **MIS INMUEBLES**: CRUD + Estadísticas (Total/Disponibles/Arrendados)
+2. **CONTRATOS**: Crear/Ver Detalle/Finalizar + Listar arrendatarios
+3. **PAGOS RECIBIDOS**: Visualización + Total calculado en tiempo real
+4. **REPORTES**: 5 tipos (Rentabilidad, Ocupación, Pagos, Mantenimiento, Estado)
+5. **MI PERFIL**: Editar datos personales
 
-- **Escalabilidad Independiente**: Cada servicio puede escalar según demanda
-- **Tecnología Heterogénea**: Diferentes tecnologías por servicio si es necesario
-- **Despliegue Independiente**: Actualizaciones sin afectar otros servicios
-- **Tolerancia a Fallos**: Fallo de un servicio no afecta a otros
-- **Equipos Independientes**: Desarrollo paralelo por equipos especializados
+**frmarrendatario** (5 pestañas):
+1. **MI CONTRATO**: Ver contrato activo + Detalles completos
+2. **MIS PAGOS**: Registrar pagos + Ver historial
+3. **MANTENIMIENTO**: Solicitar + Ver estado de solicitudes
+4. **NOTIFICACIONES**: Ver notificaciones + Marcar como leídas + Doble-clic para detalle
+5. **MI PERFIL**: Editar datos + Botón "Cambiar Contraseña"
 
-#### ⚠️ Desafíos
+#### ApiClient - Cliente HTTP
 
-- **Complejidad de Comunicación**: Manejo de llamadas entre servicios
-- **Consistencia de Datos**: Transacciones distribuidas
-- **Monitoreo**: Trazabilidad a través de múltiples servicios
-- **Testing**: Pruebas de integración más complejas
+```java
+public class ApiClient {
+    // Puertos de servicios
+    public static final int USUARIOS_PORT = 8086;
+    public static final int INMUEBLES_PORT = 8083;
+    public static final int CONTRATOS_PORT = 8084;
+    public static final int PAGOS_PORT = 8085;
+    public static final int MANTENIMIENTO_PORT = 8087;
+    public static final int NOTIFICACIONES_PORT = 8088;
+    
+    // Métodos HTTP
+    public static JSONObject get(int puerto, String endpoint)
+    public static JSONObject post(int puerto, String endpoint, JSONObject datos)
+    public static JSONObject put(int puerto, String endpoint, JSONObject datos)
+    public static JSONObject delete(int puerto, String endpoint)
+}
+```
+
+**Response Format Unificado**:
+```json
+{
+  "statusCode": 200,
+  "data": { /* datos */ }
+}
+```
+
+---
+
+## ⚙️ Microservicios Backend
+
+### 1. Usuarios Service (:8086)
+
+**Responsabilidad**: Autenticación y gestión de usuarios
+
+**Endpoints Implementados**:
+```
+POST   /api/usuarios/registro          # Crear usuario (ADMIN/PROPIETARIO/ARRENDATARIO)
+POST   /api/usuarios/login             # Login con BCrypt
+GET    /api/usuarios/{id}              # Obtener usuario
+GET    /api/usuarios?tipo=ADMIN        # Filtrar por tipo
+PUT    /api/usuarios/{id}/activar      # Activar usuario
+PUT    /api/usuarios/{id}/desactivar   # Desactivar usuario
+```
+
+**Funcionalidades**:
+- ✅ Hash BCrypt de contraseñas
+- ✅ Validación de email único
+- ✅ Gestión de roles (ADMINISTRADOR/PROPIETARIO/ARRENDATARIO)
+- ✅ Estado activo/inactivo
+
+---
+
+### 2. Inmuebles Service (:8083)
+
+**Responsabilidad**: Catálogo de propiedades
+
+**Endpoints Implementados**:
+```
+POST   /api/inmuebles                           # Crear inmueble
+GET    /api/inmuebles                           # Listar todos
+GET    /api/inmuebles/{id}                      # Obtener por ID
+GET    /api/inmuebles?propietarioId=1           # Filtrar por propietario
+PUT    /api/inmuebles/{id}                      # Actualizar completo ✨ NUEVO
+PUT    /api/inmuebles/{id}/disponibilidad       # Solo disponibilidad
+DELETE /api/inmuebles/{id}                      # Eliminar inmueble ✨ NUEVO
+```
+
+**Funcionalidades Nuevas Hoy**:
+- ✅ **PUT completo**: Actualizar todos los campos del inmueble
+- ✅ **DELETE**: Eliminar inmueble (con validación de contrato activo)
+- ✅ Validaciones de precio > 0, área > 0
+
+---
+
+### 3. Contratos Service (:8084)
+
+**Responsabilidad**: Gestión de contratos de arrendamiento
+
+**Endpoints Implementados**:
+```
+POST   /api/contratos                    # Crear contrato
+GET    /api/contratos/{id}               # Obtener por ID
+GET    /api/contratos?propietarioId=1    # Filtrar por propietario
+GET    /api/contratos?arrendatarioId=7   # Filtrar por arrendatario
+GET    /api/contratos?inmuebleId=1       # Filtrar por inmueble
+PUT    /api/contratos/{id}               # Actualizar contrato ✨ NUEVO
+PUT    /api/contratos/{id}/finalizar     # Finalizar contrato ✨ IMPLEMENTADO HOY
+DELETE /api/contratos/{id}               # Eliminar contrato ✨ NUEVO
+```
+
+**Funcionalidades Nuevas Hoy**:
+- ✅ **Finalizar Contrato**: Cambia estado a FINALIZADO + Marca inmueble como disponible
+- ✅ **Editar Contrato**: Actualización completa de campos
+- ✅ **Eliminar Contrato**: Con confirmaciones múltiples
+
+**Lógica de Negocio**:
+- Al crear: Valida inmueble disponible + Marca como NO disponible
+- Al finalizar: Marca inmueble como disponible nuevamente
+- Validación: `fechaFin > fechaInicio`
+
+---
+
+### 4. Pagos Service (:8085)
+
+**Responsabilidad**: Sistema de pagos y seguimiento
+
+**Endpoints Implementados**:
+```
+POST   /api/pagos                        # Registrar pago
+GET    /api/pagos                        # Listar todos
+GET    /api/pagos?contrato=1             # Filtrar por contrato
+GET    /api/pagos?arrendatario=7         # Filtrar por arrendatario
+PUT    /api/pagos/{id}/estado?estado=PAGADO  # Cambiar estado ✨ IMPLEMENTADO HOY
+```
+
+**Funcionalidades Nuevas Hoy**:
+- ✅ **Cambiar Estado**: PENDIENTE → PAGADO / VENCIDO / PARCIAL
+- ✅ **Marcar como Pagado**: Atajo rápido con validaciones
+- ✅ **Marcar como Vencido**: Con warnings de mora
+- ✅ **Ver Detalle Completo**: Popup con todos los datos + color dinámico
+
+**Estados de Pago**:
+- `PENDIENTE`: Esperando pago
+- `PAGADO`: Confirmado ✅
+- `VENCIDO`: Fuera de fecha 🔴
+- `PARCIAL`: Pago parcial
+
+---
+
+### 5. Mantenimiento Service (:8087)
+
+**Responsabilidad**: Solicitudes de mantenimiento
+
+**Endpoints Implementados**:
+```
+POST   /api/mantenimiento                       # Crear solicitud
+GET    /api/mantenimiento                       # Listar todas
+GET    /api/mantenimiento?solicitante=7         # Filtrar por solicitante
+GET    /api/mantenimiento?inmueble=1            # Filtrar por inmueble
+PUT    /api/mantenimiento/{id}                  # Actualizar ✨ NUEVO
+PUT    /api/mantenimiento/{id}/aprobar          # Aprobar ✨ IMPLEMENTADO HOY
+PUT    /api/mantenimiento/{id}/iniciar          # Iniciar trabajo ✨ IMPLEMENTADO HOY
+PUT    /api/mantenimiento/{id}/completar        # Completar ✨ IMPLEMENTADO HOY
+PUT    /api/mantenimiento/{id}/rechazar         # Rechazar ✨ IMPLEMENTADO HOY
+```
+
+**Funcionalidades Nuevas Hoy**:
+- ✅ **Workflow Completo**: PENDIENTE → APROBADO → EN_PROCESO → COMPLETADO
+- ✅ **Aprobar**: Admin aprueba solicitud
+- ✅ **Iniciar**: Trabajo en progreso
+- ✅ **Completar**: Requiere costo real + observaciones
+- ✅ **Rechazar**: Requiere motivo
+- ✅ **Editar**: Actualizar título, descripción, tipo, prioridad, técnico, costo
+
+**Flujo de Estados**:
+```
+PENDIENTE → APROBADO → EN_PROCESO → COMPLETADO
+             ↓
+         RECHAZADO
+```
+
+---
+
+### 6. Notificaciones Service (:8088)
+
+**Responsabilidad**: Sistema de notificaciones
+
+**Endpoints Implementados**:
+```
+POST   /api/notificaciones                      # Crear notificación
+GET    /api/notificaciones                      # Listar todas
+GET    /api/notificaciones?destinatario=email   # Filtrar por destinatario
+GET    /api/notificaciones/{id}                 # Obtener por ID
+```
+
+**Funcionalidades Nuevas Hoy**:
+- ✅ **Envío Masivo**: Admin puede enviar a múltiples usuarios
+- ✅ **Tipos**: EMAIL, SMS, WHATSAPP (simulado)
+- ✅ **Estado**: PENDIENTE, ENVIADO, FALLIDO
+- ✅ **Sistema de Leído**: Tracking visual en UI
+
+**Uso en UI**:
+- Admin: Enviar notificaciones masivas
+- Arrendatario: Ver notificaciones + Doble-clic para detalle + Marcar como leída
+
+---
+
+### 7. Propietarios Service (:8082)
+
+**Responsabilidad**: Gestión de propietarios (legacy)
+
+**Endpoints**:
+```
+POST   /api/propietarios           # Crear propietario
+GET    /api/propietarios/{id}      # Obtener por ID
+```
+
+**Nota**: Este servicio podría fusionarse con Usuarios Service en el futuro.
+
+---
+
+### 8. Reportes Service (:8089)
+
+**Responsabilidad**: Generación de reportes
+
+**Reportes Implementados** (calculados en UI):
+1. **Reporte de Rentabilidad**: Ingresos vs Gastos (Mantenimiento)
+2. **Reporte de Ocupación**: % de ocupación de inmuebles
+3. **Reporte de Pagos**: Historial completo por contrato
+4. **Reporte de Mantenimiento**: Estadísticas por estado
+5. **Estado de Inmuebles**: Listado completo con disponibilidad
 
 ---
 
 ## 💾 Arquitectura de Datos
 
-### Modelo de Base de Datos
+### Modelo de Datos Completo
 
-```mermaid
-erDiagram
-    administradores {
-        bigint adm_id PK
-        varchar adm_nombre
-        varchar adm_correo UK
-        varchar adm_contrasena
-        varchar adm_telefono
-        boolean adm_activo
-    }
-    
-    propietarios {
-        bigint prop_id PK
-        varchar prop_nombre
-        varchar prop_apellido
-        varchar prop_correo UK
-        varchar prop_contrasena
-        varchar prop_telefono
-        varchar prop_direccion
-        varchar prop_cedula UK
-        timestamp prop_fecha_registro
-        boolean prop_activo
-    }
-    
-    inmuebles {
-        bigint inm_id PK
-        bigint prop_id FK
-        varchar inm_tipo
-        varchar inm_direccion
-        varchar inm_ciudad
-        varchar inm_departamento
-        decimal inm_area
-        int inm_habitaciones
-        int inm_banos
-        int inm_parqueaderos
-        decimal inm_precio_arriendo
-        decimal inm_precio_administracion
-        text inm_descripcion
-        boolean inm_amoblado
-        boolean inm_disponible
-        timestamp inm_fecha_registro
-        boolean inm_activo
-    }
-    
-    contratos {
-        bigint cont_id PK
-        bigint inm_id FK
-        bigint prop_id FK
-        bigint arr_id FK
-        date cont_fecha_inicio
-        date cont_fecha_fin
-        decimal cont_valor_arriendo
-        decimal cont_valor_administracion
-        decimal cont_deposito
-        int cont_dia_pago
-        varchar cont_estado
-        text cont_observaciones
-        timestamp cont_fecha_creacion
-        boolean cont_activo
-    }
-    
-    pagos {
-        bigint pago_id PK
-        bigint cont_id FK
-        bigint arr_id FK
-        decimal pago_valor
-        date pago_fecha
-        date pago_mes_correspondiente
-        varchar pago_tipo
-        varchar pago_estado
-        varchar pago_metodo
-        varchar pago_referencia_transaccion
-        text pago_observaciones
-        date pago_fecha_vencimiento
-        decimal pago_mora
-        timestamp pago_fecha_registro
-    }
-    
-    propietarios ||--o{ inmuebles : "posee"
-    inmuebles ||--o{ contratos : "se arrienda en"
-    propietarios ||--o{ contratos : "firma como propietario"
-    contratos ||--o{ pagos : "genera"
+```
+┌─────────────┐
+│  usuarios   │
+│  id (PK)    │
+│  nombre     │
+│  apellido   │
+│  correo     │◄─────────────┐
+│  contrasena │              │
+│  tipo       │              │
+│  activo     │              │
+└─────────────┘              │
+                             │
+┌─────────────┐              │
+│propietarios │              │
+│  id (PK)    │              │
+└──────┬──────┘              │
+       │                     │
+       │ 1:N                 │
+       ▼                     │
+┌─────────────┐              │
+│ inmuebles   │              │
+│  id (PK)    │              │
+│  propietar. │              │ N:1
+│  tipo       │              │
+│  direccion  │◄─────┐       │
+│  disponible │      │       │
+└──────┬──────┘      │       │
+       │             │       │
+       │ 1:N         │       │
+       ▼             │       │
+┌─────────────┐      │       │
+│ contratos   │      │       │
+│  id (PK)    │      │       │
+│  inmueble   │──────┘       │
+│  propietar. │              │
+│  arrendat.  │──────────────┘
+│  estado     │
+└──────┬──────┘
+       │
+       │ 1:N
+       ├───────────────┐
+       ▼               ▼
+┌─────────────┐ ┌──────────────────┐
+│   pagos     │ │solicitudes_mant. │
+│  id (PK)    │ │  id (PK)         │
+│  contrato   │ │  inmueble        │
+│  valor      │ │  tipo            │
+│  estado     │ │  prioridad       │
+│  metodoPago │ │  estado          │
+└─────────────┘ └──────────────────┘
+
+┌──────────────────┐
+│ notificaciones   │
+│  id (PK)         │
+│  destinatario    │
+│  asunto          │
+│  mensaje         │
+│  tipo            │
+│  estado          │
+│  contrato_id     │
+└──────────────────┘
 ```
 
-### Principio "Database per Service"
+### Tablas Principales
 
-Cada microservicio es propietario de sus datos:
-
-```yaml
-Administración Service:
-  - Tabla: administradores
-  - Acceso: Directo
-  
-Propietarios Service:
-  - Tabla: propietarios
-  - Acceso: Directo
-  
-Inmuebles Service:
-  - Tabla: inmuebles
-  - Acceso: Directo
-  - Referencias: prop_id (validado via API)
-  
-Contratos Service:
-  - Tabla: contratos
-  - Acceso: Directo
-  - Referencias: inm_id, prop_id (validadas via API)
-  
-Pagos Service:
-  - Tabla: pagos
-  - Acceso: Directo
-  - Referencias: cont_id (validado via API)
-```
-
-### Estrategias de Consistencia
-
-#### 1. **Eventual Consistency**
-- Actualizaciones asíncronas entre servicios
-- Tolerancia a inconsistencias temporales
-
-#### 2. **Saga Pattern** (Futuro)
-- Transacciones distribuidas
-- Compensación automática en caso de fallo
-
-#### 3. **Event Sourcing** (Roadmap)
-- Registro de eventos para auditoria
-- Reconstrucción del estado desde eventos
+| Tabla | Registros | Uso |
+|-------|-----------|-----|
+| usuarios | ~100s | Autenticación y gestión de usuarios |
+| inmuebles | ~1000s | Catálogo de propiedades |
+| contratos | ~500s | Contratos activos e históricos |
+| pagos | ~10,000s | Transacciones mensuales |
+| solicitudes_mantenimiento | ~1000s | Tickets de mantenimiento |
+| notificaciones | ~50,000s | Historial de notificaciones |
+| propietarios | ~50s | Datos adicionales de propietarios |
 
 ---
 
 ## 🔄 Patrones de Diseño
 
-### 1. Repository Pattern
-
-Cada servicio implementa el patrón Repository para abstracción de datos:
-
+### 1. Patrón Repository (Backend)
 ```java
 @Repository
-public interface PropietarioRepository extends JpaRepository<Propietario, Long> {
-    Optional<Propietario> findByCorreo(String correo);
-    boolean existsByCorreo(String correo);
+public interface InmuebleRepository extends JpaRepository<Inmueble, Long> {
+    List<Inmueble> findByPropietarioId(Long propietarioId);
+    List<Inmueble> findByDisponible(Boolean disponible);
 }
 ```
 
-### 2. Service Layer Pattern
-
-Capa de servicio para lógica de negocio:
-
+### 2. Patrón DTO (Data Transfer Object)
 ```java
-@Service
-public class PropietarioService {
-    @Autowired
-    private PropietarioRepository repository;
-    
-    public PropietarioResponse registrar(PropietarioRequest request) {
-        // Lógica de negocio
-        // Validaciones
-        // Transformaciones
-    }
+public class InmuebleRequest {
+    private Long propietarioId;
+    private String tipo;
+    private String direccion;
+    // ... más campos
 }
 ```
 
-### 3. DTO Pattern
-
-Separación entre modelos de datos y APIs:
-
+### 3. Patrón Singleton (Frontend)
 ```java
-// Entidad de datos
-@Entity
-public class Propietario { /* ... */ }
-
-// DTO para requests
-public class PropietarioRequest { /* ... */ }
-
-// DTO para responses  
-public class PropietarioResponse { /* ... */ }
-```
-
-### 4. Circuit Breaker (Futuro)
-
-Para tolerancia a fallos en comunicación entre servicios:
-
-```java
-@Component
-public class PropietarioClient {
-    @CircuitBreaker(name = "propietarios")
-    @Retry(name = "propietarios")
-    public Optional<Propietario> findById(Long id) {
-        // Llamada HTTP
-    }
+public class SesionUsuario {
+    private static int usuarioID;
+    private static String nombre;
+    // ... métodos estáticos
 }
 ```
 
-### 5. Gateway Pattern (Futuro)
-
-API Gateway para enrutamiento y cross-cutting concerns:
-
-```yaml
-spring:
-  cloud:
-    gateway:
-      routes:
-        - id: propietarios
-          uri: lb://propietarios-service
-          predicates:
-            - Path=/api/propietarios/**
+### 4. Patrón Strategy (Validaciones)
+```java
+public class Validador {
+    public static boolean noVacio(String valor, String campo, StringBuilder errores)
+    public static boolean email(String valor, StringBuilder errores)
+    public static boolean numeroPositivo(String valor, String campo, StringBuilder errores)
+    // ... más validaciones
+}
 ```
 
 ---
 
-## 🔗 Comunicación Entre Servicios
+## 🔗 Comunicación
 
-### Tipos de Comunicación
+### Frontend → Backend
 
-#### 1. **Síncrona - HTTP REST**
-
-Usado actualmente para validaciones:
+**Todas las comunicaciones usan REST API con JSON**
 
 ```java
-// En Contratos Service
+// Ejemplo: Crear inmueble
+JSONObject datos = new JSONObject();
+datos.put("tipo", "APARTAMENTO");
+datos.put("direccion", "Calle 123");
+datos.put("precio", 1500000);
+
+JSONObject response = ApiClient.post(8083, "/api/inmuebles", datos);
+```
+
+### Backend → Backend
+
+**Comunicación Inter-Servicio con WebClient**
+
+```java
 @Service
 public class ContratoService {
-    
     @Autowired
     private WebClient.Builder webClientBuilder;
     
-    private Boolean validarPropietarioExiste(Long propietarioId) {
-        return webClientBuilder.build()
-            .get()
-            .uri("http://propietarios-service:8080/api/propietarios/" + propietarioId)
+    private Boolean validarInmuebleDisponible(Long inmuebleId) {
+        return webClient.get()
+            .uri(inmueblesServiceUrl + "/api/inmuebles/" + inmuebleId)
             .retrieve()
-            .bodyToMono(Object.class)
-            .map(p -> true)
-            .onErrorReturn(false)
+            .bodyToMono(Boolean.class)
             .block();
     }
-}
-```
-
-#### 2. **Asíncrona - Events** (Futuro)
-
-Para notificaciones y actualizaciones:
-
-```java
-// Publisher
-@EventListener
-public void onContratoCreado(ContratoCreado event) {
-    eventPublisher.publish("contrato.creado", event);
-}
-
-// Subscriber
-@EventHandler
-public void handle(ContratoCreado event) {
-    // Actualizar disponibilidad inmueble
-}
-```
-
-### Manejo de Fallos
-
-#### 1. **Timeout Configuration**
-
-```yaml
-spring:
-  webflux:
-    timeout: 5s
-```
-
-#### 2. **Retry Logic**
-
-```java
-@Retryable(
-    value = {ConnectionException.class},
-    maxAttempts = 3,
-    backoff = @Backoff(delay = 1000)
-)
-public Optional<Object> callExternalService() {
-    // Lógica de llamada
-}
-```
-
-#### 3. **Fallback Strategies**
-
-```java
-@Recover
-public Optional<Object> recover(Exception ex) {
-    log.warn("Servicio no disponible, usando fallback");
-    return Optional.empty();
 }
 ```
 
@@ -430,225 +528,80 @@ public Optional<Object> recover(Exception ex) {
 
 ## 🛡️ Seguridad
 
-### Arquitectura de Seguridad
+### Implementaciones Actuales
 
-```mermaid
-graph TB
-    subgraph "Client"
-        CLI[Cliente]
-    end
-    
-    subgraph "Security Layer"
-        JWT[JWT Token]
-        AUTH[Authentication]
-        AUTHZ[Authorization]
-    end
-    
-    subgraph "Services"
-        ADM[Admin Service]
-        PROP[Propietarios Service]
-        INM[Inmuebles Service]
-        CONT[Contratos Service]
-        PAG[Pagos Service]
-    end
-    
-    CLI --> JWT
-    JWT --> AUTH
-    AUTH --> AUTHZ
-    AUTHZ --> ADM
-    AUTHZ --> PROP
-    AUTHZ --> INM
-    AUTHZ --> CONT
-    AUTHZ --> PAG
-```
+1. **Password Hashing**: BCrypt con 10 rounds
+2. **Validación de Entrada**: En frontend Y backend
+3. **CORS Enabled**: Para permitir llamadas del frontend
+4. **Environment Variables**: Credenciales en `.env`
 
-### Implementación de Seguridad
+### Pendiente (Roadmap)
 
-#### 1. **JWT Authentication**
-
-```java
-@Component
-public class JwtTokenProvider {
-    
-    public String generateToken(Authentication auth) {
-        return Jwts.builder()
-            .setSubject(auth.getName())
-            .setIssuedAt(new Date())
-            .setExpiration(new Date(System.currentTimeMillis() + expiration))
-            .signWith(getSigningKey())
-            .compact();
-    }
-    
-    public boolean validateToken(String token) {
-        try {
-            Jwts.parserBuilder()
-                .setSigningKey(getSigningKey())
-                .build()
-                .parseClaimsJws(token);
-            return true;
-        } catch (JwtException ex) {
-            return false;
-        }
-    }
-}
-```
-
-#### 2. **Password Encryption**
-
-```java
-@Service
-public class PropietarioService {
-    
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-    
-    public Propietario save(Propietario propietario) {
-        propietario.setContrasena(
-            passwordEncoder.encode(propietario.getContrasena())
-        );
-        return repository.save(propietario);
-    }
-}
-```
-
-#### 3. **Input Validation**
-
-```java
-public class PropietarioRequest {
-    
-    @NotBlank(message = "El nombre es obligatorio")
-    @Size(max = 100)
-    private String nombre;
-    
-    @Email(message = "Formato de email inválido")
-    @NotBlank
-    private String correo;
-    
-    @Size(min = 6, message = "Mínimo 6 caracteres")
-    private String contrasena;
-}
-```
+- [ ] JWT Tokens para sesiones
+- [ ] Rate Limiting
+- [ ] HTTPS/TLS
+- [ ] Input Sanitization adicional
 
 ---
 
-## 📈 Escalabilidad
+## 📊 Métricas del Sistema
 
-### Estrategias de Escalabilidad
+### Complejidad
 
-#### 1. **Horizontal Scaling**
+| Métrica | Valor |
+|---------|-------|
+| Total de Líneas de Código Java | ~13,500 |
+| Clases Frontend | 6 |
+| Microservicios | 8 |
+| Endpoints REST | 52 |
+| Tablas BD | 7 |
+| Funcionalidades Completas | 45+ |
 
-Cada servicio puede escalarse independientemente:
+### Cobertura Funcional
 
-```yaml
-# docker-compose.yml
-version: '3.8'
-services:
-  propietarios-service:
-    image: propietarios-service:latest
-    deploy:
-      replicas: 3
-    ports:
-      - "8082-8084:8080"
-```
-
-#### 2. **Load Balancing**
-
-```yaml
-# Nginx configuration
-upstream propietarios {
-    server propietarios-service-1:8080;
-    server propietarios-service-2:8080;
-    server propietarios-service-3:8080;
-}
-```
-
-#### 3. **Caching Strategy**
-
-```java
-@Service
-public class InmuebleService {
-    
-    @Cacheable(value = "inmuebles", key = "#id")
-    public Optional<Inmueble> findById(Long id) {
-        return repository.findById(id);
-    }
-    
-    @CacheEvict(value = "inmuebles", key = "#inmueble.id")
-    public Inmueble save(Inmueble inmueble) {
-        return repository.save(inmueble);
-    }
-}
-```
-
-#### 4. **Database Scaling**
-
-**Read Replicas:**
-```yaml
-spring:
-  datasource:
-    primary:
-      url: jdbc:postgresql://master-db:5432/arrendamiento_db
-    readonly:
-      url: jdbc:postgresql://replica-db:5432/arrendamiento_db
-```
-
-**Partitioning:**
-```sql
--- Particionamiento por fecha para pagos
-CREATE TABLE pagos_2024 PARTITION OF pagos
-    FOR VALUES FROM ('2024-01-01') TO ('2025-01-01');
-```
-
-### Métricas de Rendimiento
-
-#### KPIs Objetivo
-
-| Métrica | Objetivo | Monitoreo |
-|---------|----------|-----------|
-| Response Time | < 200ms | Prometheus |
-| Throughput | > 1000 RPS | Grafana |
-| Error Rate | < 1% | AlertManager |
-| CPU Usage | < 70% | Docker Stats |
-| Memory Usage | < 80% | JVM Metrics |
+| Módulo | Cobertura | Estado |
+|--------|-----------|--------|
+| Autenticación | 100% | ✅ Completo |
+| CRUD Inmuebles | 100% | ✅ Completo |
+| CRUD Contratos | 100% | ✅ Completo |
+| Gestión Pagos | 100% | ✅ Completo |
+| Mantenimiento | 100% | ✅ Completo |
+| Notificaciones | 90% | ⚠️ Falta "marcar leído" en BD |
+| Reportes | 80% | ⚠️ Calculados en UI, no BD |
+| Mi Perfil | 70% | ⚠️ Falta PUT en backend |
 
 ---
 
-## 🔮 Evolución Futura
+## 🚀 Próximos Pasos Arquitectónicos
 
-### Roadmap Arquitectónico
+### Fase 1: Mejoras Inmediatas
+- [ ] Implementar `PUT /api/usuarios/{id}` para editar perfil
+- [ ] Implementar `PUT /api/notificaciones/{id}/marcar-leida`
+- [ ] Agregar paginación a endpoints que retornan listas
 
-#### Fase 2: Service Mesh
-- **Istio/Linkerd**: Control de tráfico y seguridad
-- **Observabilidad**: Distributed tracing
-- **Políticas**: Rate limiting, circuit breaker
+### Fase 2: Escalabilidad
+- [ ] API Gateway (Spring Cloud Gateway)
+- [ ] Service Discovery (Eureka)
+- [ ] Circuit Breaker (Resilience4j)
+- [ ] Distributed Tracing (Zipkin)
 
-#### Fase 3: Event-Driven Architecture
-- **Apache Kafka**: Message broker
-- **Event Sourcing**: Auditoria completa
-- **CQRS**: Separación de lecturas y escrituras
-
-#### Fase 4: Cloud Native
-- **Kubernetes**: Orquestación
-- **Helm Charts**: Gestión de deployments  
-- **ArgoCD**: GitOps deployment
-
-### Mejoras Continuas
-
-1. **Monitoring y Observabilidad**
-   - Métricas de negocio
-   - Alertas proactivas
-   - Health checks avanzados
-
-2. **Seguridad Avanzada**
-   - OAuth 2.0 / OpenID Connect
-   - API Keys management
-   - Encryption at rest
-
-3. **Performance Optimization**
-   - Connection pooling
-   - Query optimization
-   - CDN para assets estáticos
+### Fase 3: Modernización
+- [ ] Event-Driven Architecture (Kafka)
+- [ ] CQRS para reportes
+- [ ] Cache distribuido (Redis)
+- [ ] Base de datos por microservicio
 
 ---
 
-Esta arquitectura proporciona una base sólida para un sistema escalable y mantenible, con capacidad de evolución según las necesidades del negocio.
+## 📞 Referencias
+
+- **GitHub**: [https://github.com/durregou/Inmotrack](https://github.com/durregou/Inmotrack)
+- **Documentación Completa**: [../DOCUMENTACION.md](../DOCUMENTACION.md)
+- **API Documentation**: [./API.md](./API.md)
+- **Database Schema**: [./DATABASE.md](./DATABASE.md)
+
+---
+
+**Autor**: [David Urrego](https://github.com/durregou)  
+**Última revisión**: Octubre 2025  
+**Versión del Sistema**: 2.0.0 (Con todas las implementaciones de Octubre 2025)

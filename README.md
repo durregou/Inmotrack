@@ -135,7 +135,7 @@ mvn --version     # Debe mostrar Maven 3.8 o superior
 
 ### **Paso 1: Clonar el Repositorio**
 ```bash
-git clone <url-del-repositorio>
+git clone [https://github.com/durregou/Inmotrack](https://github.com/durregou/Inmotrack)
 cd arrendamientoProyecto\ 2
 ```
 
