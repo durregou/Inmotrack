@@ -1,0 +1,850 @@
+{
+	"info": {
+		"_postman_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+		"name": "Inmotrack - Sistema de Arrendamientos",
+		"description": "Colección completa de endpoints del sistema Inmotrack\n\nGitHub: https://github.com/durregou/Inmotrack\nAutor: David Urrego\nVersión: 2.0.0",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "1. Usuarios Service (:8086)",
+			"item": [
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"correo\": \"{{admin_email}}\",\n  \"contrasena\": \"{{admin_password}}\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}:{{usuarios_port}}/api/usuarios/login",
+							"host": ["{{base_url}}"],
+							"port": "{{usuarios_port}}",
+							"path": ["api", "usuarios", "login"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Registro Usuario",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nombre\": \"Test\",\n  \"apellido\": \"Usuario\",\n  \"correo\": \"test@example.com\",\n  \"contrasena\": \"test123\",\n  \"telefono\": \"3001234567\",\n  \"direccion\": \"Calle Test 123\",\n  \"cedula\": \"1234567890\",\n  \"tipoUsuario\": \"ARRENDATARIO\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}:{{usuarios_port}}/api/usuarios/registro",
+							"host": ["{{base_url}}"],
+							"port": "{{usuarios_port}}",
+							"path": ["api", "usuarios", "registro"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Obtener Usuario por ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}:{{usuarios_port}}/api/usuarios/{{user_id}}",
+							"host": ["{{base_url}}"],
+							"port": "{{usuarios_port}}",
+							"path": ["api", "usuarios", "{{user_id}}"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Listar Usuarios por Tipo",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}:{{usuarios_port}}/api/usuarios?tipo=ARRENDATARIO",
+							"host": ["{{base_url}}"],
+							"port": "{{usuarios_port}}",
+							"path": ["api", "usuarios"],
+							"query": [
+								{
+									"key": "tipo",
+									"value": "ARRENDATARIO"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Activar Usuario",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}:{{usuarios_port}}/api/usuarios/{{user_id}}/activar",
+							"host": ["{{base_url}}"],
+							"port": "{{usuarios_port}}",
+							"path": ["api", "usuarios", "{{user_id}}", "activar"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Desactivar Usuario",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}:{{usuarios_port}}/api/usuarios/{{user_id}}/desactivar",
+							"host": ["{{base_url}}"],
+							"port": "{{usuarios_port}}",
+							"path": ["api", "usuarios", "{{user_id}}", "desactivar"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "2. Inmuebles Service (:8083)",
+			"item": [
+				{
+					"name": "Crear Inmueble",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"propietarioId\": 1,\n  \"tipo\": \"APARTAMENTO\",\n  \"direccion\": \"Carrera 10 #20-30\",\n  \"ciudad\": \"Bogotá\",\n  \"departamento\": \"Cundinamarca\",\n  \"area\": 65.5,\n  \"habitaciones\": 2,\n  \"banos\": 1,\n  \"parqueaderos\": 1,\n  \"precioArriendo\": 1500000,\n  \"precioAdministracion\": 200000,\n  \"descripcion\": \"Apartamento amplio y luminoso\",\n  \"amoblado\": false\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}:{{inmuebles_port}}/api/inmuebles",
+							"host": ["{{base_url}}"],
+							"port": "{{inmuebles_port}}",
+							"path": ["api", "inmuebles"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Listar Todos los Inmuebles",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}:{{inmuebles_port}}/api/inmuebles",
+							"host": ["{{base_url}}"],
+							"port": "{{inmuebles_port}}",
+							"path": ["api", "inmuebles"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Obtener Inmueble por ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}:{{inmuebles_port}}/api/inmuebles/{{inmueble_id}}",
+							"host": ["{{base_url}}"],
+							"port": "{{inmuebles_port}}",
+							"path": ["api", "inmuebles", "{{inmueble_id}}"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Filtrar por Propietario",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}:{{inmuebles_port}}/api/inmuebles?propietarioId=1",
+							"host": ["{{base_url}}"],
+							"port": "{{inmuebles_port}}",
+							"path": ["api", "inmuebles"],
+							"query": [
+								{
+									"key": "propietarioId",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Actualizar Inmueble Completo",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"propietarioId\": 1,\n  \"tipo\": \"APARTAMENTO\",\n  \"direccion\": \"Carrera 10 #20-30 ACTUALIZADO\",\n  \"ciudad\": \"Bogotá\",\n  \"area\": 70.0,\n  \"habitaciones\": 3,\n  \"banos\": 2,\n  \"precioArriendo\": 1800000,\n  \"descripcion\": \"Descripción actualizada\",\n  \"disponible\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}:{{inmuebles_port}}/api/inmuebles/{{inmueble_id}}",
+							"host": ["{{base_url}}"],
+							"port": "{{inmuebles_port}}",
+							"path": ["api", "inmuebles", "{{inmueble_id}}"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Cambiar Disponibilidad",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"disponible\": false\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}:{{inmuebles_port}}/api/inmuebles/{{inmueble_id}}/disponibilidad",
+							"host": ["{{base_url}}"],
+							"port": "{{inmuebles_port}}",
+							"path": ["api", "inmuebles", "{{inmueble_id}}", "disponibilidad"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Eliminar Inmueble",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}:{{inmuebles_port}}/api/inmuebles/{{inmueble_id}}",
+							"host": ["{{base_url}}"],
+							"port": "{{inmuebles_port}}",
+							"path": ["api", "inmuebles", "{{inmueble_id}}"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "3. Contratos Service (:8084)",
+			"item": [
+				{
+					"name": "Crear Contrato",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"inmuebleId\": 1,\n  \"propietarioId\": 1,\n  \"arrendatarioId\": 7,\n  \"fechaInicio\": \"2025-01-01\",\n  \"fechaFin\": \"2025-12-31\",\n  \"valorArriendo\": 1500000,\n  \"valorAdministracion\": 200000,\n  \"deposito\": 1500000,\n  \"diaPago\": 5,\n  \"observaciones\": \"Contrato de 1 año\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}:{{contratos_port}}/api/contratos",
+							"host": ["{{base_url}}"],
+							"port": "{{contratos_port}}",
+							"path": ["api", "contratos"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Listar Todos los Contratos",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}:{{contratos_port}}/api/contratos",
+							"host": ["{{base_url}}"],
+							"port": "{{contratos_port}}",
+							"path": ["api", "contratos"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Obtener Contrato por ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}:{{contratos_port}}/api/contratos/{{contrato_id}}",
+							"host": ["{{base_url}}"],
+							"port": "{{contratos_port}}",
+							"path": ["api", "contratos", "{{contrato_id}}"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Filtrar por Propietario",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}:{{contratos_port}}/api/contratos?propietarioId=1",
+							"host": ["{{base_url}}"],
+							"port": "{{contratos_port}}",
+							"path": ["api", "contratos"],
+							"query": [
+								{
+									"key": "propietarioId",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Filtrar por Arrendatario",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}:{{contratos_port}}/api/contratos?arrendatarioId=7",
+							"host": ["{{base_url}}"],
+							"port": "{{contratos_port}}",
+							"path": ["api", "contratos"],
+							"query": [
+								{
+									"key": "arrendatarioId",
+									"value": "7"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Actualizar Contrato",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"fechaInicio\": \"2025-01-01\",\n  \"fechaFin\": \"2026-01-01\",\n  \"valorArriendo\": 1600000,\n  \"valorAdministracion\": 220000,\n  \"observaciones\": \"Extensión de contrato\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}:{{contratos_port}}/api/contratos/{{contrato_id}}",
+							"host": ["{{base_url}}"],
+							"port": "{{contratos_port}}",
+							"path": ["api", "contratos", "{{contrato_id}}"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Finalizar Contrato",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{}"
+						},
+						"url": {
+							"raw": "{{base_url}}:{{contratos_port}}/api/contratos/{{contrato_id}}/finalizar",
+							"host": ["{{base_url}}"],
+							"port": "{{contratos_port}}",
+							"path": ["api", "contratos", "{{contrato_id}}", "finalizar"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Eliminar Contrato",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}:{{contratos_port}}/api/contratos/{{contrato_id}}",
+							"host": ["{{base_url}}"],
+							"port": "{{contratos_port}}",
+							"path": ["api", "contratos", "{{contrato_id}}"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "4. Pagos Service (:8085)",
+			"item": [
+				{
+					"name": "Registrar Pago",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"contratoId\": 1,\n  \"arrendatarioId\": 7,\n  \"fecha\": \"2025-10-04\",\n  \"valor\": 1500000,\n  \"metodoPago\": \"TRANSFERENCIA\",\n  \"mesCorrespondiente\": \"Octubre 2025\",\n  \"comprobante\": \"TRF-001234\",\n  \"observaciones\": \"Pago puntual\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}:{{pagos_port}}/api/pagos",
+							"host": ["{{base_url}}"],
+							"port": "{{pagos_port}}",
+							"path": ["api", "pagos"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Listar Todos los Pagos",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}:{{pagos_port}}/api/pagos",
+							"host": ["{{base_url}}"],
+							"port": "{{pagos_port}}",
+							"path": ["api", "pagos"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Filtrar por Contrato",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}:{{pagos_port}}/api/pagos?contrato=1",
+							"host": ["{{base_url}}"],
+							"port": "{{pagos_port}}",
+							"path": ["api", "pagos"],
+							"query": [
+								{
+									"key": "contrato",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Filtrar por Arrendatario",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}:{{pagos_port}}/api/pagos?arrendatario=7",
+							"host": ["{{base_url}}"],
+							"port": "{{pagos_port}}",
+							"path": ["api", "pagos"],
+							"query": [
+								{
+									"key": "arrendatario",
+									"value": "7"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Cambiar Estado - PAGADO",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}:{{pagos_port}}/api/pagos/{{pago_id}}/estado?estado=PAGADO",
+							"host": ["{{base_url}}"],
+							"port": "{{pagos_port}}",
+							"path": ["api", "pagos", "{{pago_id}}", "estado"],
+							"query": [
+								{
+									"key": "estado",
+									"value": "PAGADO"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Cambiar Estado - VENCIDO",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}:{{pagos_port}}/api/pagos/{{pago_id}}/estado?estado=VENCIDO",
+							"host": ["{{base_url}}"],
+							"port": "{{pagos_port}}",
+							"path": ["api", "pagos", "{{pago_id}}", "estado"],
+							"query": [
+								{
+									"key": "estado",
+									"value": "VENCIDO"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "5. Mantenimiento Service (:8087)",
+			"item": [
+				{
+					"name": "Crear Solicitud",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"inmuebleId\": 1,\n  \"solicitanteId\": 7,\n  \"titulo\": \"Fuga de agua en baño\",\n  \"descripcion\": \"Hay una fuga en la tubería del baño principal\",\n  \"tipo\": \"PLOMERIA\",\n  \"prioridad\": \"ALTA\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}:{{mantenimiento_port}}/api/mantenimiento",
+							"host": ["{{base_url}}"],
+							"port": "{{mantenimiento_port}}",
+							"path": ["api", "mantenimiento"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Listar Todas",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}:{{mantenimiento_port}}/api/mantenimiento",
+							"host": ["{{base_url}}"],
+							"port": "{{mantenimiento_port}}",
+							"path": ["api", "mantenimiento"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Filtrar por Solicitante",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}:{{mantenimiento_port}}/api/mantenimiento?solicitante=7",
+							"host": ["{{base_url}}"],
+							"port": "{{mantenimiento_port}}",
+							"path": ["api", "mantenimiento"],
+							"query": [
+								{
+									"key": "solicitante",
+									"value": "7"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Actualizar Solicitud",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"titulo\": \"Título actualizado\",\n  \"descripcion\": \"Descripción actualizada\",\n  \"tipo\": \"ELECTRICO\",\n  \"prioridad\": \"URGENTE\",\n  \"tecnico\": \"Juan Técnico\",\n  \"costoEstimado\": 150000\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}:{{mantenimiento_port}}/api/mantenimiento/{{mantenimiento_id}}",
+							"host": ["{{base_url}}"],
+							"port": "{{mantenimiento_port}}",
+							"path": ["api", "mantenimiento", "{{mantenimiento_id}}"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Aprobar Solicitud",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}:{{mantenimiento_port}}/api/mantenimiento/{{mantenimiento_id}}/aprobar",
+							"host": ["{{base_url}}"],
+							"port": "{{mantenimiento_port}}",
+							"path": ["api", "mantenimiento", "{{mantenimiento_id}}", "aprobar"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Iniciar Trabajo",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}:{{mantenimiento_port}}/api/mantenimiento/{{mantenimiento_id}}/iniciar",
+							"host": ["{{base_url}}"],
+							"port": "{{mantenimiento_port}}",
+							"path": ["api", "mantenimiento", "{{mantenimiento_id}}", "iniciar"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Completar Trabajo",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"costoReal\": 180000,\n  \"observaciones\": \"Trabajo completado satisfactoriamente\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}:{{mantenimiento_port}}/api/mantenimiento/{{mantenimiento_id}}/completar",
+							"host": ["{{base_url}}"],
+							"port": "{{mantenimiento_port}}",
+							"path": ["api", "mantenimiento", "{{mantenimiento_id}}", "completar"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Rechazar Solicitud",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"motivo\": \"Solicitud fuera de cobertura del contrato\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}:{{mantenimiento_port}}/api/mantenimiento/{{mantenimiento_id}}/rechazar",
+							"host": ["{{base_url}}"],
+							"port": "{{mantenimiento_port}}",
+							"path": ["api", "mantenimiento", "{{mantenimiento_id}}", "rechazar"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "6. Notificaciones Service (:8088)",
+			"item": [
+				{
+					"name": "Crear Notificación",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"destinatario\": \"inquilino@test.com\",\n  \"asunto\": \"Recordatorio de Pago\",\n  \"mensaje\": \"Su pago del mes de octubre vence el día 5\",\n  \"tipo\": \"EMAIL\",\n  \"contratoId\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}:{{notificaciones_port}}/api/notificaciones",
+							"host": ["{{base_url}}"],
+							"port": "{{notificaciones_port}}",
+							"path": ["api", "notificaciones"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Listar Todas",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}:{{notificaciones_port}}/api/notificaciones",
+							"host": ["{{base_url}}"],
+							"port": "{{notificaciones_port}}",
+							"path": ["api", "notificaciones"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Filtrar por Destinatario",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}:{{notificaciones_port}}/api/notificaciones?destinatario=inquilino@test.com",
+							"host": ["{{base_url}}"],
+							"port": "{{notificaciones_port}}",
+							"path": ["api", "notificaciones"],
+							"query": [
+								{
+									"key": "destinatario",
+									"value": "inquilino@test.com"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Obtener por ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}:{{notificaciones_port}}/api/notificaciones/{{notificacion_id}}",
+							"host": ["{{base_url}}"],
+							"port": "{{notificaciones_port}}",
+							"path": ["api", "notificaciones", "{{notificacion_id}}"]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost",
+			"type": "string"
+		},
+		{
+			"key": "usuarios_port",
+			"value": "8086",
+			"type": "string"
+		},
+		{
+			"key": "inmuebles_port",
+			"value": "8083",
+			"type": "string"
+		},
+		{
+			"key": "contratos_port",
+			"value": "8084",
+			"type": "string"
+		},
+		{
+			"key": "pagos_port",
+			"value": "8085",
+			"type": "string"
+		},
+		{
+			"key": "mantenimiento_port",
+			"value": "8087",
+			"type": "string"
+		},
+		{
+			"key": "notificaciones_port",
+			"value": "8088",
+			"type": "string"
+		},
+		{
+			"key": "admin_email",
+			"value": "admin@sistema.com",
+			"type": "string"
+		},
+		{
+			"key": "admin_password",
+			"value": "admin123",
+			"type": "string"
+		},
+		{
+			"key": "user_id",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "inmueble_id",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "contrato_id",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "pago_id",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "mantenimiento_id",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "notificacion_id",
+			"value": "1",
+			"type": "string"
+		}
+	]
+}
+
