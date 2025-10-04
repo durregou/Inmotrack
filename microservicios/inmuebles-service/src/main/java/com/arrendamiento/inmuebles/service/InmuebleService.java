@@ -63,6 +63,32 @@ public class InmuebleService {
         return inmuebleRepository.findByCiudad(ciudad);
     }
 
+    public Inmueble actualizarInmueble(Long id, InmuebleRequest request) {
+        Optional<Inmueble> inmuebleOpt = inmuebleRepository.findById(id);
+        if (inmuebleOpt.isPresent()) {
+            Inmueble inmueble = inmuebleOpt.get();
+            
+            // Actualizar todos los campos
+            inmueble.setPropietarioId(request.getPropietarioId());
+            inmueble.setTipo(request.getTipo());
+            inmueble.setDireccion(request.getDireccion());
+            inmueble.setCiudad(request.getCiudad());
+            inmueble.setDepartamento(request.getDepartamento());
+            inmueble.setArea(request.getArea());
+            inmueble.setHabitaciones(request.getHabitaciones());
+            inmueble.setBanos(request.getBanos());
+            inmueble.setParqueaderos(request.getParqueaderos());
+            inmueble.setPrecioArriendo(request.getPrecioArriendo());
+            inmueble.setPrecioAdministracion(request.getPrecioAdministracion());
+            inmueble.setDescripcion(request.getDescripcion());
+            inmueble.setAmoblado(request.getAmoblado());
+            inmueble.setDisponible(request.getDisponible());
+            
+            return inmuebleRepository.save(inmueble);
+        }
+        throw new RuntimeException("Inmueble no encontrado");
+    }
+
     public Inmueble actualizarDisponibilidad(Long id, Boolean disponible) {
         Optional<Inmueble> inmuebleOpt = inmuebleRepository.findById(id);
         if (inmuebleOpt.isPresent()) {

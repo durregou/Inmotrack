@@ -85,6 +85,25 @@ public class InmuebleController {
     }
 
     /**
+     * PUT /api/inmuebles/{id} → actualizar inmueble completo
+     */
+    @PutMapping("/{id}")
+    public ResponseEntity<?> actualizarInmueble(
+            @PathVariable Long id,
+            @Valid @RequestBody InmuebleRequest request) {
+        try {
+            Inmueble inmueble = inmuebleService.actualizarInmueble(id, request);
+            return ResponseEntity.ok(inmueble);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ErrorResponse("Inmueble no encontrado", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ErrorResponse("Error interno", e.getMessage()));
+        }
+    }
+
+    /**
      * PUT /api/inmuebles/{id}/disponibilidad → actualizar disponibilidad
      */
     @PutMapping("/{id}/disponibilidad")

@@ -4,6 +4,7 @@ package Principal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import javax.swing.JOptionPane;
+import org.json.JSONObject;
 public class frmregistro extends javax.swing.JDialog {
 
     /**
@@ -137,47 +138,73 @@ public class frmregistro extends javax.swing.JDialog {
     }//GEN-LAST:event_txtcontraseñaActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-          String nombre = txtnombre.getText();
-    String telefono = txttelefono.getText();
-    String correo = txtcorreo.getText();
-    String documento = txtdocumento.getText();
-    String contrasena = new String(txtcontraseña.getPassword());
-    String tipoUsuario = combotipousuario.getSelectedItem().toString();
+        String nombre = txtnombre.getText();
+        String telefono = txttelefono.getText();
+        String correo = txtcorreo.getText();
+        String documento = txtdocumento.getText();
+        String contrasena = new String(txtcontraseña.getPassword());
+        String tipoUsuario = combotipousuario.getSelectedItem().toString();
 
-    if (nombre.isEmpty() || telefono.isEmpty() || correo.isEmpty() || documento.isEmpty() || contrasena.isEmpty() || tipoUsuario.equals("Seleccionar")) {
-        JOptionPane.showMessageDialog(this, "Todos los campos son obligatorios.");
-        return;
-    }
+        if (nombre.isEmpty() || telefono.isEmpty() || correo.isEmpty() || documento.isEmpty() || contrasena.isEmpty() || tipoUsuario.equals("Seleccionar")) {
+            JOptionPane.showMessageDialog(this, "Todos los campos son obligatorios.");
+            return;
+        }
 
-    String tabla = "";
-    String sql = "";
-    switch (tipoUsuario) {
-        case "Administrador":
-            tabla = "administrador";
-            sql = "INSERT INTO " + tabla + " (adm_nombre, adm_correo, adm_contrasena, adm_telefono, adm_documento) VALUES (?, ?, ?, ?, ?)";
-            break;
-        case "Propietario":
-            tabla = "propietario";
-            sql = "INSERT INTO " + tabla + " (prop_nombre, prop_correo, prop_contrasena, prop_telefono, prop_documento) VALUES (?, ?, ?, ?, ?)";
-            break;
-        case "Arrendatario":
-            tabla = "arrendatario";
-            sql = "INSERT INTO " + tabla + " (arr_nombre, arr_correo, arr_contrasena, arr_telefono, arr_documento) VALUES (?, ?, ?, ?, ?)";
-            break;
-    }
+        try {
+            // Separar nombre y apellido (asumiendo que el usuario ingrese nombre completo)
+            String[] partesNombre = nombre.split(" ", 2);
+            String nombreSolo = partesNombre[0];
+            String apellido = partesNombre.length > 1 ? partesNombre[1] : "N/A";
+            
+            // Crear el JSON para el registro
+            JSONObject registroData = new JSONObject();
+            registroData.put("nombre", nombreSolo);
+            registroData.put("apellido", apellido);
+            registroData.put("correo", correo);
+            registroData.put("contrasena", contrasena);
+            registroData.put("telefono", telefono);
+            registroData.put("cedula", documento);
+            registroData.put("tipoUsuario", tipoUsuario.toUpperCase());
 
-    try (Connection con = ConexionSQLite.conectar();
-         PreparedStatement pst = con.prepareStatement(sql)) {
-        pst.setString(1, nombre);
-        pst.setString(2, correo);
-        pst.setString(3, contrasena);
-        pst.setString(4, telefono);
-        pst.setString(5, documento);
-        pst.executeUpdate();
-        JOptionPane.showMessageDialog(this, "Usuario registrado exitosamente.");
-    } catch (Exception e) {
-        JOptionPane.showMessageDialog(this, "Error al registrar usuario: " + e.getMessage());
-    }
+            // Llamar al API de usuarios
+            JSONObject response = ApiClient.post(ApiClient.USUARIOS_PORT, "/api/usuarios/registro", registroData);
+            
+            int statusCode = response.getInt("statusCode");
+            
+            if (statusCode == 201 || statusCode == 200) {
+                JOptionPane.showMessageDialog(this, "Usuario registrado exitosamente.");
+                
+                // Limpiar campos
+                txtnombre.setText("");
+                txttelefono.setText("");
+                txtcorreo.setText("");
+                txtdocumento.setText("");
+                txtcontraseña.setText("");
+                combotipousuario.setSelectedIndex(0);
+                
+                // Cerrar ventana de registro
+                this.dispose();
+                
+            } else {
+                Object dataObj = response.opt("data");
+                String errorMsg = "Error al registrar usuario. Código: " + statusCode;
+                
+                if (dataObj instanceof JSONObject) {
+                    JSONObject errorData = (JSONObject) dataObj;
+                    if (errorData.has("error")) {
+                        errorMsg = errorData.getString("error");
+                    } else if (errorData.has("mensaje")) {
+                        errorMsg = errorData.getString("mensaje");
+                    }
+                }
+                
+                JOptionPane.showMessageDialog(this, errorMsg);
+            }
+            
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error de conexión con el servidor: " + e.getMessage());
+            e.printStackTrace();
+        }
     }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
