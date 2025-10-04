@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import javax.swing.JOptionPane;
+import org.json.JSONObject;
 /**
  *
  * @author David Urrego
@@ -20,7 +21,127 @@ public class frmlogin extends javax.swing.JDialog {
     public frmlogin(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
+        mejorarEstiloBotonRegistro();
+        agregarBotonRecuperarContrasena();
         setLocationRelativeTo(null);
+    }
+    
+    // Mejorar el estilo del botón de registro
+    private void mejorarEstiloBotonRegistro() {
+        // Botón de Registro - Estilo moderno y compacto
+        jButton2.setText("Crear cuenta");
+        jButton2.setFont(new java.awt.Font("Arial", java.awt.Font.BOLD, 11));
+        jButton2.setForeground(new java.awt.Color(255, 255, 255));
+        jButton2.setBackground(new java.awt.Color(40, 167, 69)); // Verde
+        jButton2.setBorder(javax.swing.BorderFactory.createCompoundBorder(
+            javax.swing.BorderFactory.createLineBorder(new java.awt.Color(40, 167, 69), 1),
+            javax.swing.BorderFactory.createEmptyBorder(6, 12, 6, 12)
+        ));
+        jButton2.setFocusPainted(false);
+        jButton2.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        
+        // Botón de Iniciar Sesión - Estilo principal
+        jButton1.setFont(new java.awt.Font("Arial", java.awt.Font.BOLD, 13));
+        jButton1.setForeground(new java.awt.Color(255, 255, 255));
+        jButton1.setBackground(new java.awt.Color(0, 123, 255)); // Azul
+        jButton1.setBorder(javax.swing.BorderFactory.createCompoundBorder(
+            javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 123, 255), 1),
+            javax.swing.BorderFactory.createEmptyBorder(10, 30, 10, 30)
+        ));
+        jButton1.setFocusPainted(false);
+        jButton1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+    }
+    
+    // Agregar botón de recuperar contraseña después del layout generado
+    private void agregarBotonRecuperarContrasena() {
+        // Crear botón con estilo de enlace
+        javax.swing.JButton btnOlvideContrasena = new javax.swing.JButton();
+        btnOlvideContrasena.setText("¿Olvidaste tu contraseña?");
+        btnOlvideContrasena.setFont(new java.awt.Font("Arial", java.awt.Font.PLAIN, 11));
+        btnOlvideContrasena.setForeground(new java.awt.Color(0, 102, 204));
+        btnOlvideContrasena.setBorderPainted(false);
+        btnOlvideContrasena.setContentAreaFilled(false);
+        btnOlvideContrasena.setFocusPainted(false);
+        btnOlvideContrasena.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        
+        btnOlvideContrasena.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                recuperarContrasena();
+            }
+        });
+        
+        // Agregar efecto hover
+        btnOlvideContrasena.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                btnOlvideContrasena.setForeground(new java.awt.Color(0, 50, 150));
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                btnOlvideContrasena.setForeground(new java.awt.Color(0, 102, 204));
+            }
+        });
+        
+        // Agregar directamente al jPanel1 y actualizar el layout
+        jPanel1.add(btnOlvideContrasena);
+        
+        // Obtener el layout actual y modificarlo para incluir el nuevo botón
+        javax.swing.GroupLayout layout = (javax.swing.GroupLayout) jPanel1.getLayout();
+        
+        // Actualizar el grupo vertical para agregar el botón debajo de jButton1
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(17, 17, 17)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jButton2)
+                    .addComponent(jLabel1))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 24, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel2)
+                    .addComponent(txtusuario, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(24, 24, 24)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel3)
+                    .addComponent(txtcontraseña, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addComponent(jButton1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnOlvideContrasena)
+                .addGap(15, 15, 15))
+        );
+        
+        // Actualizar el grupo horizontal para centrar el botón
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(19, 19, 19)
+                .addComponent(jButton2)
+                .addGap(55, 55, 55)
+                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 131, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(129, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(41, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(jButton1)
+                        .addGap(152, 152, 152))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(btnOlvideContrasena)
+                        .addGap(120, 120, 120))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(18, 18, 18)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(txtusuario, javax.swing.GroupLayout.DEFAULT_SIZE, 182, Short.MAX_VALUE)
+                            .addComponent(txtcontraseña))
+                        .addGap(95, 95, 95))))
+        );
+        
+        // Revalidar y repintar
+        jPanel1.revalidate();
+        jPanel1.repaint();
+        this.pack(); // Reajustar el tamaño del diálogo
     }
 
     /**
@@ -137,65 +258,86 @@ public class frmlogin extends javax.swing.JDialog {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         String usuario = txtusuario.getText();
-    String contrasena = txtcontraseña.getText();
+        String contrasena = txtcontraseña.getText();
 
-    if (usuario.isEmpty() || contrasena.isEmpty()) {
-        JOptionPane.showMessageDialog(this, "Ingrese todos los campos.");
-        return;
-    }
-
-    String[][] tablas = {
-        {"administrador", "adm_id", "adm_correo", "adm_contrasena", "frmadministrador"},
-        {"propietario", "prop_id", "prop_correo", "prop_contrasena", "frmpropietario"},
-        {"arrendatario", "arr_id", "arr_correo", "arr_contrasena", "frmarrendatario"}
-    };
-
-    boolean encontrado = false;
-    int usuarioID = -1; // Variable para guardar el ID del usuario autenticado
-
-    for (String[] tabla : tablas) {
-        String sql = "SELECT " + tabla[1] + " FROM " + tabla[0] + " WHERE " + tabla[2] + " = ? AND " + tabla[3] + " = ?";
-        try (Connection con = ConexionSQLite.conectar();
-             PreparedStatement pst = con.prepareStatement(sql)) {
-            pst.setString(1, usuario);
-            pst.setString(2, contrasena);
-            try (ResultSet rs = pst.executeQuery()) {
-                if (rs.next()) {
-                    encontrado = true;
-                    usuarioID = rs.getInt(tabla[1]); // Captura el ID del usuario autenticado
-
-                    // Abre la ventana correspondiente
-                    switch (tabla[4]) {
-                        case "frmadministrador":
-                            adminWindow = new frmadministrador(null, true);
-                            adminWindow.setVisible(true);
-                            break;
-                        case "frmpropietario":
-                            propietarioWindow = new frmpropietario(null, true);
-                            propietarioWindow.setVisible(true);
-                            break;
-                        case "frmarrendatario":
-                            arrendatarioWindow = new frmarrendatario(null, true);
-                            arrendatarioWindow.setVisible(true);
-                            break;
-                    }
-                    this.dispose(); // Cierra la ventana actual
-                    break;
-                }
-            }
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Error en la consulta: " + e.getMessage());
+        if (usuario.isEmpty() || contrasena.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Ingrese todos los campos.");
+            return;
         }
-    }
 
-    if (!encontrado) {
-        JOptionPane.showMessageDialog(this, "Credenciales incorrectas.");
-    } else {
-        System.out.println("Usuario autenticado con ID: " + usuarioID);
-        // Aquí puedes pasar el usuarioID a la ventana correspondiente o almacenarlo en una clase global.
-    }
+        try {
+            // Crear el JSON para el login
+            JSONObject loginData = new JSONObject();
+            loginData.put("correo", usuario);
+            loginData.put("contrasena", contrasena);
 
-
+            // Llamar al API de usuarios
+            JSONObject response = ApiClient.post(ApiClient.USUARIOS_PORT, "/api/usuarios/login", loginData);
+            
+            int statusCode = response.getInt("statusCode");
+            
+            if (statusCode == 200) {
+                JSONObject data = response.getJSONObject("data");
+                
+                // Obtener información del usuario
+                String tipoUsuario = data.getString("tipoUsuario");
+                int usuarioID = data.getInt("id");
+                String nombre = data.optString("nombre", "Usuario");
+                String apellido = data.optString("apellido", "");
+                String nombreCompleto = nombre + " " + apellido;
+                
+                // Guardar sesión
+                SesionUsuario.setUsuarioID(usuarioID);
+                SesionUsuario.setNombre(nombre);
+                SesionUsuario.setApellido(apellido);
+                SesionUsuario.setCorreo(usuario);
+                SesionUsuario.setRol(tipoUsuario);
+                
+                System.out.println("Usuario autenticado: " + nombreCompleto + " (ID: " + usuarioID + ", Rol: " + tipoUsuario + ")");
+                
+                // Abrir ventana correspondiente según el rol
+                switch (tipoUsuario.toUpperCase()) {
+                    case "ADMINISTRADOR":
+                        adminWindow = new frmadministrador(null, true);
+                        adminWindow.setVisible(true);
+                        break;
+                    case "PROPIETARIO":
+                        propietarioWindow = new frmpropietario(null, true);
+                        propietarioWindow.setVisible(true);
+                        break;
+                    case "ARRENDATARIO":
+                        arrendatarioWindow = new frmarrendatario(null, true);
+                        arrendatarioWindow.setVisible(true);
+                        break;
+                    default:
+                        JOptionPane.showMessageDialog(this, "Rol de usuario no reconocido: " + tipoUsuario);
+                        return;
+                }
+                
+                this.dispose(); // Cierra la ventana de login
+                
+            } else if (statusCode == 401) {
+                JOptionPane.showMessageDialog(this, "Credenciales incorrectas.");
+            } else {
+                Object dataObj = response.opt("data");
+                String errorMsg = "Error al iniciar sesión. Código: " + statusCode;
+                
+                if (dataObj instanceof JSONObject) {
+                    JSONObject errorData = (JSONObject) dataObj;
+                    if (errorData.has("error")) {
+                        errorMsg = errorData.getString("error");
+                    } else if (errorData.has("mensaje")) {
+                        errorMsg = errorData.getString("mensaje");
+                    }
+                }
+                
+                JOptionPane.showMessageDialog(this, errorMsg);
+            }
+            
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error de conexión con el servidor: " + e.getMessage());
+            e.printStackTrace();
+        }
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
@@ -204,6 +346,79 @@ public class frmlogin extends javax.swing.JDialog {
         fr.setVisible(true);
     }//GEN-LAST:event_jButton2ActionPerformed
 
+    // Método para recuperar contraseña
+    private void recuperarContrasena() {
+        String correo = JOptionPane.showInputDialog(this, 
+            "Ingresa tu correo electrónico registrado:\n(Recibirás un enlace de recuperación)", 
+            "Recuperar Contraseña", 
+            JOptionPane.QUESTION_MESSAGE);
+        
+        if (correo == null || correo.trim().isEmpty()) {
+            return; // Usuario canceló
+        }
+        
+        correo = correo.trim();
+        
+        // Validar formato de correo
+        if (!correo.contains("@") || !correo.contains(".")) {
+            JOptionPane.showMessageDialog(this, 
+                "Por favor ingresa un correo electrónico válido.", 
+                "Correo Inválido", 
+                JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        
+        try {
+            // Verificar si el usuario existe
+            JSONObject verificarData = new JSONObject();
+            verificarData.put("correo", correo);
+            
+            // Crear notificación de recuperación
+            JSONObject notificacionData = new JSONObject();
+            notificacionData.put("destinatario", correo);
+            notificacionData.put("tipo", "EMAIL");
+            notificacionData.put("asunto", "Recuperación de Contraseña");
+            notificacionData.put("mensaje", 
+                "Hemos recibido una solicitud para restablecer tu contraseña.\n\n" +
+                "Para tu seguridad, por favor contacta al administrador del sistema con tu correo electrónico: " + correo + "\n\n" +
+                "El administrador te ayudará a restablecer tu contraseña de forma segura.\n\n" +
+                "Si no solicitaste este cambio, ignora este mensaje.\n\n" +
+                "Equipo de Soporte - Sistema de Arrendamiento"
+            );
+            notificacionData.put("estado", "PENDIENTE");
+            
+            // Enviar notificación
+            JSONObject response = ApiClient.post(ApiClient.NOTIFICACIONES_PORT, 
+                "/api/notificaciones", notificacionData);
+            
+            int statusCode = response.getInt("statusCode");
+            
+            if (statusCode == 201 || statusCode == 200) {
+                JOptionPane.showMessageDialog(this, 
+                    "✓ Solicitud enviada exitosamente\n\n" +
+                    "Se ha enviado un correo a: " + correo + "\n\n" +
+                    "Por favor revisa tu bandeja de entrada y sigue las instrucciones.\n" +
+                    "Si no recibes el correo en unos minutos, contacta al administrador.", 
+                    "Correo Enviado", 
+                    JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(this, 
+                    "No se pudo enviar el correo de recuperación.\n\n" +
+                    "Por favor contacta directamente al administrador del sistema.", 
+                    "Error", 
+                    JOptionPane.ERROR_MESSAGE);
+            }
+            
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, 
+                "Error al procesar la solicitud: " + e.getMessage() + "\n\n" +
+                "Por favor contacta al administrador.", 
+                "Error", 
+                JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+        }
+    }
+    
     /**
      * @param args the command line arguments
      */
