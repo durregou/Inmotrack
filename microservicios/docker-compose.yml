@@ -91,6 +91,70 @@ services:
     networks:
       - arrendamiento-network
 
+  # Microservicio de Usuarios
+  usuarios-service:
+    build: ./usuarios-service
+    ports:
+      - "8086:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-db:5432/arrendamiento_db
+      - SPRING_DATASOURCE_USERNAME=arrendamiento_user
+      - SPRING_DATASOURCE_PASSWORD=arrendamiento_pass
+      - MAIL_USERNAME=${MAIL_USERNAME:-}
+      - MAIL_PASSWORD=${MAIL_PASSWORD:-}
+    depends_on:
+      - postgres-db
+    networks:
+      - arrendamiento-network
+
+  # Microservicio de Notificaciones
+  notificaciones-service:
+    build: ./notificaciones-service
+    ports:
+      - "8087:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-db:5432/arrendamiento_db
+      - SPRING_DATASOURCE_USERNAME=arrendamiento_user
+      - SPRING_DATASOURCE_PASSWORD=arrendamiento_pass
+      - MAIL_USERNAME=${MAIL_USERNAME:-}
+      - MAIL_PASSWORD=${MAIL_PASSWORD:-}
+    depends_on:
+      - postgres-db
+    networks:
+      - arrendamiento-network
+
+  # Microservicio de Mantenimiento
+  mantenimiento-service:
+    build: ./mantenimiento-service
+    ports:
+      - "8088:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-db:5432/arrendamiento_db
+      - SPRING_DATASOURCE_USERNAME=arrendamiento_user
+      - SPRING_DATASOURCE_PASSWORD=arrendamiento_pass
+    depends_on:
+      - postgres-db
+    networks:
+      - arrendamiento-network
+
+  # Microservicio de Reportes
+  reportes-service:
+    build: ./reportes-service
+    ports:
+      - "8089:8080"
+    environment:
+      - CONTRATOS_SERVICE_URL=http://contratos-service:8080
+      - PAGOS_SERVICE_URL=http://pagos-service:8080
+      - INMUEBLES_SERVICE_URL=http://inmuebles-service:8080
+      - MANTENIMIENTO_SERVICE_URL=http://mantenimiento-service:8080
+    depends_on:
+      - contratos-service
+      - pagos-service
+      - inmuebles-service
+      - mantenimiento-service
+    networks:
+      - arrendamiento-network
+
 volumes:
   postgres_data:
 

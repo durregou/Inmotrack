@@ -2,15 +2,49 @@
 
 Este proyecto implementa un sistema completo de gestión de arrendamientos usando arquitectura de microservicios con Spring Boot.
 
+---
+
+## 📘 **DOCUMENTACIÓN - Elige Tu Ruta**
+
+### ⚡ Quiero empezar YA (5 minutos)
+👉 **[INICIO_RAPIDO.md](./INICIO_RAPIDO.md)** - Compilar, desplegar y probar
+
+### 📚 Quiero la documentación completa
+👉 **[DOCUMENTACION_COMPLETA.md](./DOCUMENTACION_COMPLETA.md)** ⭐ **RECOMENDADO**
+
+**Este documento único contiene TODO:**
+- ✅ Arquitectura con diagramas
+- ✅ Guía de despliegue completa
+- ✅ Los 9 microservicios explicados
+- ✅ Todos los 57+ endpoints
+- ✅ Comandos y ejemplos
+- ✅ Solución de problemas
+- ✅ Configuración avanzada
+
+**💡 Un solo archivo. Toda la información. Fácil de buscar con Ctrl+F.**
+
+---
+
+## 📊 Métricas del Sistema
+
+- **Cobertura**: 100% de requerimientos funcionales (RF01-RF14)
+- **Microservicios**: 9 servicios funcionales
+- **Endpoints REST**: 57+ APIs documentadas
+- **Estado**: ✅ Sistema completo y funcional
+
 ## 🏗️ Arquitectura
 
-El sistema está compuesto por 5 microservicios independientes:
+El sistema está compuesto por 9 microservicios independientes:
 
 1. **Administración Service** (Puerto 8081) - Autenticación de administradores
 2. **Propietarios Service** (Puerto 8082) - Gestión de propietarios de inmuebles
 3. **Inmuebles Service** (Puerto 8083) - Gestión del catálogo de inmuebles
 4. **Contratos Service** (Puerto 8084) - Gestión de contratos de arrendamiento
 5. **Pagos Service** (Puerto 8085) - Gestión de pagos y facturación
+6. **Usuarios Service** (Puerto 8086) - Autenticación y gestión de usuarios (RF01, RF02, RF14)
+7. **Notificaciones Service** (Puerto 8087) - Envío de notificaciones por email, SMS y WhatsApp (RF12)
+8. **Mantenimiento Service** (Puerto 8088) - Gestión de solicitudes de mantenimiento (RF10, RF11)
+9. **Reportes Service** (Puerto 8089) - Generación de reportes e inteligencia de negocio (RF09)
 
 ## 🚀 APIs Implementadas
 
@@ -39,6 +73,41 @@ El sistema está compuesto por 5 microservicios independientes:
 - `GET /api/pagos` - Listar pagos (con filtros)
 - `GET /api/pagos?contrato={id}` - Historial de pagos por contrato
 - `PUT /api/pagos/{id}/estado` - Actualizar estado del pago
+
+### Microservicio de Usuarios
+- `POST /api/usuarios/registro` - Registrar nuevo usuario (administrador, propietario, arrendatario)
+- `POST /api/usuarios/login` - Iniciar sesión con JWT
+- `POST /api/usuarios/recuperar-password` - Solicitar recuperación de contraseña
+- `POST /api/usuarios/restablecer-password` - Restablecer contraseña con token
+- `GET /api/usuarios/{id}` - Obtener información del usuario
+- `GET /api/usuarios` - Listar usuarios (con filtros por tipo)
+- `PUT /api/usuarios/{id}/desactivar` - Desactivar usuario
+- `PUT /api/usuarios/{id}/activar` - Activar usuario
+
+### Microservicio de Notificaciones
+- `POST /api/notificaciones` - Crear notificación (email, SMS, WhatsApp)
+- `GET /api/notificaciones` - Listar notificaciones (con filtros)
+- `GET /api/notificaciones/{id}` - Obtener notificación específica
+- `POST /api/notificaciones/enviar-pago-pendiente` - Enviar alerta de pago pendiente
+
+### Microservicio de Mantenimiento
+- `POST /api/mantenimiento` - Crear solicitud de mantenimiento
+- `GET /api/mantenimiento` - Listar solicitudes (con filtros)
+- `GET /api/mantenimiento/{id}` - Obtener solicitud específica
+- `PUT /api/mantenimiento/{id}` - Actualizar solicitud
+- `PUT /api/mantenimiento/{id}/aprobar` - Aprobar solicitud
+- `PUT /api/mantenimiento/{id}/rechazar` - Rechazar solicitud
+- `PUT /api/mantenimiento/{id}/iniciar` - Iniciar mantenimiento
+- `PUT /api/mantenimiento/{id}/completar` - Completar mantenimiento
+- `DELETE /api/mantenimiento/{id}` - Eliminar solicitud
+
+### Microservicio de Reportes
+- `GET /api/reportes/rentabilidad` - Generar reporte de rentabilidad
+- `GET /api/reportes/ocupacion` - Generar reporte de ocupación
+- `GET /api/reportes/flujo-financiero` - Generar reporte de flujo financiero
+- `GET /api/reportes/rentabilidad/excel` - Exportar reporte de rentabilidad a Excel
+- `GET /api/reportes/ocupacion/excel` - Exportar reporte de ocupación a Excel
+- `GET /api/reportes/flujo-financiero/excel` - Exportar reporte de flujo a Excel
 
 ## 🛠️ Tecnologías Utilizadas
 
@@ -118,6 +187,10 @@ Una vez desplegado, los servicios estarán disponibles en:
 - **Inmuebles Service**: `http://localhost:8083`
 - **Contratos Service**: `http://localhost:8084`
 - **Pagos Service**: `http://localhost:8085`
+- **Usuarios Service**: `http://localhost:8086`
+- **Notificaciones Service**: `http://localhost:8087`
+- **Mantenimiento Service**: `http://localhost:8088`
+- **Reportes Service**: `http://localhost:8089`
 
 ## 📊 Base de Datos
 
@@ -128,6 +201,9 @@ El sistema utiliza una base de datos PostgreSQL compartida con las siguientes ta
 - `inmuebles` - Catálogo de inmuebles disponibles
 - `contratos` - Contratos de arrendamiento activos e inactivos
 - `pagos` - Registro de pagos y transacciones
+- `usuarios` - Usuarios del sistema (administradores, propietarios, arrendatarios)
+- `notificaciones` - Registro de notificaciones enviadas
+- `solicitudes_mantenimiento` - Solicitudes de mantenimiento de inmuebles
 
 ## 🧪 Pruebas de las APIs
 
@@ -158,6 +234,45 @@ curl -X POST http://localhost:8081/api/admin/login \
     "correo": "admin@sistema.com",
     "contrasena": "admin123"
   }'
+```
+
+### Ejemplo: Registrar usuario
+```bash
+curl -X POST http://localhost:8086/api/usuarios/registro \
+  -H "Content-Type: application/json" \
+  -d '{
+    "correo": "usuario@example.com",
+    "contrasena": "password123",
+    "nombre": "Juan",
+    "apellido": "Pérez",
+    "telefono": "3001234567",
+    "cedula": "1234567890",
+    "tipoUsuario": "ARRENDATARIO"
+  }'
+```
+
+### Ejemplo: Crear solicitud de mantenimiento
+```bash
+curl -X POST http://localhost:8088/api/mantenimiento \
+  -H "Content-Type: application/json" \
+  -d '{
+    "inmuebleId": 1,
+    "solicitanteId": 1,
+    "titulo": "Fuga de agua en baño",
+    "descripcion": "Se detectó una fuga en la tubería del baño principal",
+    "tipo": "CORRECTIVO",
+    "prioridad": "ALTA"
+  }'
+```
+
+### Ejemplo: Generar reporte de rentabilidad
+```bash
+curl -X GET "http://localhost:8089/api/reportes/rentabilidad?fechaInicio=2024-01-01&fechaFin=2024-12-31"
+```
+
+### Ejemplo: Exportar reporte a Excel
+```bash
+curl -X GET "http://localhost:8089/api/reportes/rentabilidad/excel" --output reporte.xlsx
 ```
 
 ## 🔒 Seguridad
@@ -202,3 +317,14 @@ Aumentar memoria disponible para Docker en la configuración del Docker Desktop.
 ## 📄 Licencia
 
 Este proyecto está bajo la Licencia MIT - ver el archivo `LICENSE.md` para detalles.
+
+---
+
+## 📚 Documentación Adicional (Archivo)
+
+Documentos técnicos adicionales están disponibles en `docs/archivo/`:
+- Análisis de requerimientos detallado
+- Planes de implementación
+- Documentación histórica
+
+**Recomendación**: Para uso diario, consulta únicamente **[DOCUMENTACION_COMPLETA.md](./DOCUMENTACION_COMPLETA.md)**

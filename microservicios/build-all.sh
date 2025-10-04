@@ -28,7 +28,7 @@ compile_service() {
 }
 
 # Lista de microservicios
-services=("administracion-service" "propietarios-service" "inmuebles-service" "contratos-service" "pagos-service")
+services=("administracion-service" "propietarios-service" "inmuebles-service" "contratos-service" "pagos-service" "usuarios-service" "notificaciones-service" "mantenimiento-service" "reportes-service")
 
 # Compilar cada servicio
 for service in "${services[@]}"; do

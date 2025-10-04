@@ -1,0 +1,34 @@
+spring:
+  application:
+    name: reportes-service
+  
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+      - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
+
+server:
+  port: 8080
+
+# URLs de otros microservicios
+contratos:
+  service:
+    url: ${CONTRATOS_SERVICE_URL:http://localhost:8084}
+
+pagos:
+  service:
+    url: ${PAGOS_SERVICE_URL:http://localhost:8085}
+
+inmuebles:
+  service:
+    url: ${INMUEBLES_SERVICE_URL:http://localhost:8083}
+
+mantenimiento:
+  service:
+    url: ${MANTENIMIENTO_SERVICE_URL:http://localhost:8088}
+
+logging:
+  level:
+    com.arrendamiento: DEBUG
+    org.springframework.web: INFO
+
