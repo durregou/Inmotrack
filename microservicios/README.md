@@ -7,21 +7,27 @@ Este proyecto implementa un sistema completo de gestión de arrendamientos usand
 ## 📘 **DOCUMENTACIÓN - Elige Tu Ruta**
 
 ### ⚡ Quiero empezar YA (5 minutos)
-👉 **[INICIO_RAPIDO.md](./INICIO_RAPIDO.md)** - Compilar, desplegar y probar
+👉 **[../INICIO_RAPIDO.md](../INICIO_RAPIDO.md)** - Compilar, desplegar y probar
 
 ### 📚 Quiero la documentación completa
-👉 **[DOCUMENTACION_COMPLETA.md](./DOCUMENTACION_COMPLETA.md)** ⭐ **RECOMENDADO**
+👉 **[../docs/MICROSERVICIOS.md](../docs/MICROSERVICIOS.md)** ⭐ **RECOMENDADO**
 
 **Este documento único contiene TODO:**
 - ✅ Arquitectura con diagramas
 - ✅ Guía de despliegue completa
-- ✅ Los 9 microservicios explicados
-- ✅ Todos los 57+ endpoints
+- ✅ Los 6 microservicios principales explicados
+- ✅ Todos los 41+ endpoints documentados
 - ✅ Comandos y ejemplos
 - ✅ Solución de problemas
 - ✅ Configuración avanzada
 
 **💡 Un solo archivo. Toda la información. Fácil de buscar con Ctrl+F.**
+
+### 📖 Documentación por Microservicio
+👉 **[../docs/microservices/](../docs/microservices/)** - Documentación individual de cada servicio
+
+### 🧪 Colecciones de Postman
+👉 **[postman-collections/](./postman-collections/)** - 52 endpoints listos para probar
 
 ---
 
@@ -320,11 +326,17 @@ Este proyecto está bajo la Licencia MIT - ver el archivo `LICENSE.md` para deta
 
 ---
 
-## 📚 Documentación Adicional (Archivo)
+## 📚 Documentación Adicional
 
-Documentos técnicos adicionales están disponibles en `docs/archivo/`:
-- Análisis de requerimientos detallado
-- Planes de implementación
-- Documentación histórica
+### Documentación Principal del Proyecto
+- **[../README.md](../README.md)** - Guía principal del proyecto
+- **[../DOCUMENTACION.md](../DOCUMENTACION.md)** - Documentación técnica completa
+- **[../docs/README.md](../docs/README.md)** - Índice de documentación
+- **[../docs/ARCHITECTURE.md](../docs/ARCHITECTURE.md)** - Arquitectura del sistema
+- **[../docs/API.md](../docs/API.md)** - Documentación de 52 endpoints
+- **[../docs/DATABASE.md](../docs/DATABASE.md)** - Esquema de base de datos
 
-**Recomendación**: Para uso diario, consulta únicamente **[DOCUMENTACION_COMPLETA.md](./DOCUMENTACION_COMPLETA.md)**
+### Scripts Útiles
+- **[../scripts/README.md](../scripts/README.md)** - Guía de scripts de automatización
+
+**Recomendación**: Para uso diario, consulta **[../docs/MICROSERVICIOS.md](../docs/MICROSERVICIOS.md)** que contiene toda la información unificada

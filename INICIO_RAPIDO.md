@@ -123,9 +123,11 @@ docker-compose up -d
 ## 📚 Siguiente Paso
 
 Una vez que explores el sistema, consulta:
-- **[README.md](./README.md)** - Documentación completa
-- **[DOCUMENTACION.md](./DOCUMENTACION.md)** - Guía técnica
-- **[docs/GUIA_RAPIDA_USUARIO.md](./docs/GUIA_RAPIDA_USUARIO.md)** - Manual de usuario
+- **[README.md](./README.md)** - Documentación completa del proyecto
+- **[DOCUMENTACION.md](./DOCUMENTACION.md)** - Guía técnica detallada
+- **[docs/README.md](./docs/README.md)** - Índice de documentación
+- **[docs/MICROSERVICIOS.md](./docs/MICROSERVICIOS.md)** - Documentación de microservicios
+- **[microservicios/postman-collections/](./microservicios/postman-collections/)** - Colecciones de Postman
 
 ---
 

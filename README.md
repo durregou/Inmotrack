@@ -243,10 +243,12 @@ arrendamientoProyecto 2/
 │   └── crear-notificaciones-demo-fixed.sh
 │
 ├── 📂 docs/                    # Documentación adicional
-│   ├── CREDENCIALES_PRUEBA.md
-│   ├── GUIA_RAPIDA_USUARIO.md
-│   ├── INTEGRACION_VISUAL_MICROSERVICIOS.md
-│   └── RESUMEN_FINAL.md
+│   ├── README.md              # Índice de documentación
+│   ├── ARCHITECTURE.md        # Arquitectura del sistema
+│   ├── API.md                 # Documentación de API REST
+│   ├── DATABASE.md            # Esquema de base de datos
+│   ├── MICROSERVICIOS.md      # Documentación unificada de microservicios
+│   └── microservices/         # Documentación por servicio
 │
 ├── 📂 build/                   # Archivos compilados
 ├── 📄 README.md               # Este archivo
@@ -257,11 +259,23 @@ arrendamientoProyecto 2/
 
 ## 📚 **Documentación Adicional**
 
+### **Documentación Principal**
 - **[DOCUMENTACION.md](./DOCUMENTACION.md)** - Documentación técnica completa del sistema
-- **[docs/CREDENCIALES_PRUEBA.md](./docs/CREDENCIALES_PRUEBA.md)** - Lista completa de credenciales
-- **[docs/GUIA_RAPIDA_USUARIO.md](./docs/GUIA_RAPIDA_USUARIO.md)** - Guía de uso detallada
-- **[docs/INTEGRACION_VISUAL_MICROSERVICIOS.md](./docs/INTEGRACION_VISUAL_MICROSERVICIOS.md)** - Detalles de integración
-- **[microservicios/README.md](./microservicios/README.md)** - Documentación de microservicios
+- **[INICIO_RAPIDO.md](./INICIO_RAPIDO.md)** - Guía de inicio rápido (5 minutos)
+
+### **Documentación Técnica**
+- **[docs/README.md](./docs/README.md)** - Índice completo de documentación
+- **[docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md)** - Arquitectura del sistema
+- **[docs/API.md](./docs/API.md)** - 52 endpoints documentados
+- **[docs/DATABASE.md](./docs/DATABASE.md)** - Esquema de base de datos
+- **[docs/MICROSERVICIOS.md](./docs/MICROSERVICIOS.md)** - Documentación unificada de microservicios
+
+### **Microservicios**
+- **[microservicios/README.md](./microservicios/README.md)** - Información de microservicios
+- **[microservicios/postman-collections/](./microservicios/postman-collections/)** - Colecciones de Postman
+
+### **Scripts**
+- **[scripts/README.md](./scripts/README.md)** - Guía de scripts de automatización
 
 ---
 

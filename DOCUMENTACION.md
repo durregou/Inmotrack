@@ -787,10 +787,18 @@ javac -cp "sqlite-jdbc-3.7.2.jar:json-20231013.jar" -d build/classes src/Princip
 
 ## 📞 Contacto y Soporte
 
-Para más información, consulta los otros documentos en la carpeta `docs/`:
-- [CREDENCIALES_PRUEBA.md](./docs/CREDENCIALES_PRUEBA.md)
-- [GUIA_RAPIDA_USUARIO.md](./docs/GUIA_RAPIDA_USUARIO.md)
-- [INTEGRACION_VISUAL_MICROSERVICIOS.md](./docs/INTEGRACION_VISUAL_MICROSERVICIOS.md)
+Para más información, consulta los otros documentos del proyecto:
+
+### 📚 Documentación Adicional
+- **[README.md](./README.md)** - Guía principal del proyecto
+- **[INICIO_RAPIDO.md](./INICIO_RAPIDO.md)** - Inicio rápido en 5 minutos
+- **[docs/README.md](./docs/README.md)** - Índice completo de documentación
+- **[docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md)** - Arquitectura detallada
+- **[docs/API.md](./docs/API.md)** - Documentación de 52 endpoints
+- **[docs/DATABASE.md](./docs/DATABASE.md)** - Esquema de base de datos
+- **[docs/MICROSERVICIOS.md](./docs/MICROSERVICIOS.md)** - Documentación unificada de microservicios
+- **[scripts/README.md](./scripts/README.md)** - Guía de scripts
+- **[microservicios/postman-collections/](./microservicios/postman-collections/)** - Colecciones de Postman
 
 ### 🐙 GitHub
 
