@@ -356,6 +356,7 @@ Este proyecto fue desarrollado como parte de un proyecto académico.
 
 ## 👥 **Autor**
 
+**Sara Guauque**  
 **David Urrego**  
 GitHub: [@durregou](https://github.com/durregou)  
 Repositorio: [Inmotrack](https://github.com/durregou/Inmotrack)  
